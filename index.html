@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VentCalc">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <title>Ventilator Tank Calculator</title>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Ventilator Tank Calculator</h1>
+      <p class="subtitle">Estimate total litres and tank size</p>
+    </header>
+
+    <section class="input-section">
+      <label>Minute Ventilation (L/min)</label>
+      <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
+
+      <label>Leak (L/min)</label>
+      <input type="number" id="leak" placeholder="Enter value" step="0.01">
+
+      <label>Bias Flow (L/min)</label>
+      <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
+
+      <label>Hours to Ventilate</label>
+      <input type="number" id="hours" placeholder="Enter value" step="0.01">
+
+      <button onclick="calculate()">Calculate</button>
+    </section>
+
+    <section class="result-section" id="results" style="display:none;">
+      <h2>Results</h2>
+      <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
+      <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
+      <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
+    </section>
+
+    <footer>
+      <p>© 2025 VentCalc | Built for personal use</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
