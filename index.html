@@ -1,110 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ventilator Tank Calculator</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .container { max-width: 400px; margin: auto; }
-    label { display: block; margin-top: 10px; }
-    input { width: 100%; padding: 5px; margin-top: 3px; }
-    button { margin-top: 15px; padding: 10px 15px; width: 100%; }
-    #results { margin-top: 20px; background: #eee; padding: 10px; display: none; }
-    #debug { background: #222; color: #0f0; padding: 10px; margin-top: 20px; font-family: monospace; white-space: pre-wrap; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ventilator Tank Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+  }
+  .container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  h1 {
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1em;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 20px;
+    padding: 15px;
+    width: 100%;
+    font-size: 1.1em;
+    background: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+  }
+  button:active {
+    background: #0056b3;
+  }
+  #results {
+    margin-top: 25px;
+    background: #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    display: none;
+    font-size: 1em;
+  }
+  #debug {
+    margin-top: 20px;
+    background: #222;
+    color: #0f0;
+    padding: 15px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 8px;
+    font-size: 0.9em;
+  }
+  @media (max-width: 400px) {
+    h1 { font-size: 1.5em; }
+    input, button { font-size: 1em; padding: 10px; }
+    #results, #debug { font-size: 0.85em; padding: 10px; }
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Ventilator Tank Calculator</h1>
+<div class="container">
+  <h1>Ventilator Tank Calculator</h1>
 
-    <label>Minute Ventilation (L/min)</label>
-    <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
+  <label>Minute Ventilation (L/min)</label>
+  <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
 
-    <label>Leak (L/min)</label>
-    <input type="number" id="leak" placeholder="Enter value" step="0.01">
+  <label>Leak (L/min)</label>
+  <input type="number" id="leak" placeholder="Enter value" step="0.01">
 
-    <label>Bias Flow (L/min)</label>
-    <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
+  <label>Bias Flow (L/min)</label>
+  <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
 
-    <label>Hours to Ventilate</label>
-    <input type="number" id="hours" placeholder="Enter value" step="0.01">
+  <label>Hours to Ventilate</label>
+  <input type="number" id="hours" placeholder="Enter value" step="0.01">
 
-    <button onclick="calculate()">Calculate</button>
+  <button onclick="calculate()">Calculate</button>
 
-    <div id="results">
-      <h2>Results</h2>
-      <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
-      <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
-      <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-    </div>
-
-    <div id="debug">
-      Debug Output:
-    </div>
+  <div id="results">
+    <h2>Results</h2>
+    <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
+    <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
+    <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
   </div>
 
-  <script>
-    function logDebug(message) {
-      const debugBox = document.getElementById("debug");
-      if (debugBox) {
-        debugBox.textContent += message + "\n";
-      }
-      console.log(message);
-    }
+  <div id="debug">
+    Debug Output:
+  </div>
+</div>
 
-    window.calculate = function() {
-      logDebug("=== Calculate button clicked ===");
+<script>
+function logDebug(message) {
+  const debugBox = document.getElementById("debug");
+  if (debugBox) debugBox.textContent += message + "\n";
+  console.log(message);
+}
 
-      try {
-        const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
-        const leak = parseFloat(document.getElementById("leak").value) || 0;
-        const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
-        const hours = parseFloat(document.getElementById("hours").value) || 0;
+window.calculate = function() {
+  logDebug("=== Calculate button clicked ===");
 
-        logDebug("Inputs received:");
-        logDebug("Minute Ventilation: " + minuteVentilation);
-        logDebug("Leak: " + leak);
-        logDebug("Bias Flow: " + biasFlow);
-        logDebug("Hours: " + hours);
+  try {
+    const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
+    const leak = parseFloat(document.getElementById("leak").value) || 0;
+    const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
+    const hours = parseFloat(document.getElementById("hours").value) || 0;
 
-        const litresPerMinute = minuteVentilation + leak + biasFlow;
-        logDebug("Litres per Minute = " + litresPerMinute);
+    logDebug("Inputs received:");
+    logDebug("Minute Ventilation: " + minuteVentilation);
+    logDebug("Leak: " + leak);
+    logDebug("Bias Flow: " + biasFlow);
+    logDebug("Hours: " + hours);
 
-        const totalLitres = litresPerMinute * hours * 60;
-        logDebug("Total Litres = " + totalLitres);
+    const litresPerMinute = minuteVentilation + leak + biasFlow;
+    logDebug("Litres per Minute = " + litresPerMinute);
 
-        const tankSizes = [
-          { name: "D", value: 425 },
-          { name: "DJ", value: 640 },
-          { name: "E", value: 680 },
-          { name: "M", value: 1738 },
-          { name: "M/MM/M122", value: 3455 },
-          { name: "H/K", value: 7080 }
-        ];
+    const totalLitres = litresPerMinute * hours * 60;
+    logDebug("Total Litres = " + totalLitres);
 
-        let selectedTank = "None – too large";
-        for (let i = 0; i < tankSizes.length; i++) {
-          if (totalLitres <= tankSizes[i].value) {
-            selectedTank = tankSizes[i].name;
-            break;
-          }
-        }
+    const tankSizes = [
+      { name: "D", value: 425 },
+      { name: "DJ", value: 640 },
+      { name: "E", value: 680 },
+      { name: "M", value: 1738 },
+      { name: "M/MM/M122", value: 3455 },
+      { name: "H/K", value: 7080 }
+    ];
 
-        logDebug("Selected Tank = " + selectedTank);
-
-        const resultsDiv = document.getElementById("results");
-        if (resultsDiv) {
-          document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
-          document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
-          document.getElementById("tankSize").innerText = selectedTank;
-          resultsDiv.style.display = "block";
-        }
-
-      } catch (error) {
-        logDebug("ERROR: " + error.message);
+    let selectedTank = "None – too large";
+    for (let i = 0; i < tankSizes.length; i++) {
+      if (totalLitres <= tankSizes[i].value) {
+        selectedTank = tankSizes[i].name;
+        break;
       }
     }
-  </script>
+
+    logDebug("Selected Tank = " + selectedTank);
+
+    const resultsDiv = document.getElementById("results");
+    if (resultsDiv) {
+      document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
+      document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
+      document.getElementById("tankSize").innerText = selectedTank;
+      resultsDiv.style.display = "block";
+    }
+
+  } catch (error) {
+    logDebug("ERROR: " + error.message);
+  }
+}
+</script>
 </body>
 </html>
+
