@@ -99,7 +99,7 @@
     <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
     <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
     <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-    <p><strong>Closest Tank:</strong> <span id="closestTank"></span></p>
+    <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
   </div>
 
   <div id="debug">
@@ -146,33 +146,30 @@ window.calculate = function() {
 
     // Recommended tank = first tank not exceeded
     let selectedTank = "None – too large";
+    let selectedTankValue = 0;
     for (let i = 0; i < tankSizes.length; i++) {
       if (totalLitres <= tankSizes[i].value) {
         selectedTank = tankSizes[i].name;
+        selectedTankValue = tankSizes[i].value;
         break;
       }
     }
 
-    // Closest tank = minimal absolute difference
-    let closestTank = tankSizes[0].name;
-    let minDiff = Math.abs(totalLitres - tankSizes[0].value);
-    for (let i = 1; i < tankSizes.length; i++) {
-      let diff = Math.abs(totalLitres - tankSizes[i].value);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestTank = tankSizes[i].name;
-      }
+    // Calculate extra litres left in the tank
+    let extraLitres = 0;
+    if (selectedTankValue > 0) {
+      extraLitres = selectedTankValue - totalLitres;
     }
 
     logDebug("Selected Tank = " + selectedTank);
-    logDebug("Closest Tank = " + closestTank);
+    logDebug("Extra Litres Left = " + extraLitres);
 
     const resultsDiv = document.getElementById("results");
     if (resultsDiv) {
       document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
       document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
       document.getElementById("tankSize").innerText = selectedTank;
-      document.getElementById("closestTank").innerText = closestTank;
+      document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
       resultsDiv.style.display = "block";
     }
 
