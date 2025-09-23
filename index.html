@@ -3,52 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VentCalc">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
   <title>Ventilator Tank Calculator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 400px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 5px; margin-top: 3px; }
+    button { margin-top: 15px; padding: 10px 15px; width: 100%; }
+    #results { margin-top: 20px; background: #eee; padding: 10px; display: none; }
+    #debug { background: #222; color: #0f0; padding: 10px; margin-top: 20px; font-family: monospace; white-space: pre-wrap; }
+  </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>Ventilator Tank Calculator</h1>
-      <p class="subtitle">Estimate total litres and tank size</p>
-    </header>
+    <h1>Ventilator Tank Calculator</h1>
 
-    <section class="input-section">
-      <label>Minute Ventilation (L/min)</label>
-      <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
+    <label>Minute Ventilation (L/min)</label>
+    <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
 
-      <label>Leak (L/min)</label>
-      <input type="number" id="leak" placeholder="Enter value" step="0.01">
+    <label>Leak (L/min)</label>
+    <input type="number" id="leak" placeholder="Enter value" step="0.01">
 
-      <label>Bias Flow (L/min)</label>
-      <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
+    <label>Bias Flow (L/min)</label>
+    <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
 
-      <label>Hours to Ventilate</label>
-      <input type="number" id="hours" placeholder="Enter value" step="0.01">
+    <label>Hours to Ventilate</label>
+    <input type="number" id="hours" placeholder="Enter value" step="0.01">
 
-      <button onclick="calculate()">Calculate</button>
-    </section>
+    <button onclick="calculate()">Calculate</button>
 
-    <section class="result-section" id="results" style="display:none;">
+    <div id="results">
       <h2>Results</h2>
       <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
       <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
       <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-    </section>
+    </div>
 
-    <footer>
-      <p>© 2025 VentCalc | Built for personal use</p>
-    </footer>
+    <div id="debug">
+      Debug Output:
+    </div>
   </div>
 
-  
-  <div id="debug" style="background: #222; color: #0f0; padding: 10px; margin-top: 20px; font-family: monospace; white-space: pre-wrap;">
-Debug Output:
-</div>
-<script src="script.js"></script>
+  <script>
+    function logDebug(message) {
+      const debugBox = document.getElementById("debug");
+      if (debugBox) {
+        debugBox.textContent += message + "\n";
+      }
+      console.log(message);
+    }
+
+    window.calculate = function() {
+      logDebug("=== Calculate button clicked ===");
+
+      try {
+        const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
+        const leak = parseFloat(document.getElementById("leak").value) || 0;
+        const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
+        const hours = parseFloat(document.getElementById("hours").value) || 0;
+
+        logDebug("Inputs received:");
+        logDebug("Minute Ventilation: " + minuteVentilation);
+        logDebug("Leak: " + leak);
+        logDebug("Bias Flow: " + biasFlow);
+        logDebug("Hours: " + hours);
+
+        const litresPerMinute = minuteVentilation + leak + biasFlow;
+        logDebug("Litres per Minute = " + litresPerMinute);
+
+        const totalLitres = litresPerMinute * hours * 60;
+        logDebug("Total Litres = " + totalLitres);
+
+        const tankSizes = [
+          { name: "D", value: 425 },
+          { name: "DJ", value: 640 },
+          { name: "E", value: 680 },
+          { name: "M", value: 1738 },
+          { name: "M/MM/M122", value: 3455 },
+          { name: "H/K", value: 7080 }
+        ];
+
+        let selectedTank = "None – too large";
+        for (let i = 0; i < tankSizes.length; i++) {
+          if (totalLitres <= tankSizes[i].value) {
+            selectedTank = tankSizes[i].name;
+            break;
+          }
+        }
+
+        logDebug("Selected Tank = " + selectedTank);
+
+        const resultsDiv = document.getElementById("results");
+        if (resultsDiv) {
+          document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
+          document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
+          document.getElementById("tankSize").innerText = selectedTank;
+          resultsDiv.style.display = "block";
+        }
+
+      } catch (error) {
+        logDebug("ERROR: " + error.message);
+      }
+    }
+  </script>
 </body>
 </html>
