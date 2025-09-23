@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,6 +101,7 @@
     <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
     <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
     <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
+    <p id="alertMessage" style="color:red; font-weight:bold;"></p>
   </div>
 
   <div id="debug">
@@ -155,14 +157,19 @@ window.calculate = function() {
       }
     }
 
-    // Calculate extra litres left in the tank
+    // Extra litres left in tank
     let extraLitres = 0;
+    let alertMessage = "";
     if (selectedTankValue > 0) {
       extraLitres = selectedTankValue - totalLitres;
+    } else {
+      extraLitres = 0; // Show 0 when no tank fits
+      alertMessage = "WARNING: Total litres exceed all available tanks!";
     }
 
     logDebug("Selected Tank = " + selectedTank);
     logDebug("Extra Litres Left = " + extraLitres);
+    if (alertMessage) logDebug(alertMessage);
 
     const resultsDiv = document.getElementById("results");
     if (resultsDiv) {
@@ -170,6 +177,7 @@ window.calculate = function() {
       document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
       document.getElementById("tankSize").innerText = selectedTank;
       document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
+      document.getElementById("alertMessage").innerText = alertMessage;
       resultsDiv.style.display = "block";
     }
 
@@ -180,4 +188,3 @@ window.calculate = function() {
 </script>
 </body>
 </html>
-
