@@ -99,6 +99,7 @@
     <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
     <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
     <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
+    <p><strong>Closest Tank:</strong> <span id="closestTank"></span></p>
   </div>
 
   <div id="debug">
@@ -143,6 +144,7 @@ window.calculate = function() {
       { name: "H/K", value: 7080 }
     ];
 
+    // Recommended tank = first tank not exceeded
     let selectedTank = "None – too large";
     for (let i = 0; i < tankSizes.length; i++) {
       if (totalLitres <= tankSizes[i].value) {
@@ -151,13 +153,26 @@ window.calculate = function() {
       }
     }
 
+    // Closest tank = minimal absolute difference
+    let closestTank = tankSizes[0].name;
+    let minDiff = Math.abs(totalLitres - tankSizes[0].value);
+    for (let i = 1; i < tankSizes.length; i++) {
+      let diff = Math.abs(totalLitres - tankSizes[i].value);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestTank = tankSizes[i].name;
+      }
+    }
+
     logDebug("Selected Tank = " + selectedTank);
+    logDebug("Closest Tank = " + closestTank);
 
     const resultsDiv = document.getElementById("results");
     if (resultsDiv) {
       document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
       document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
       document.getElementById("tankSize").innerText = selectedTank;
+      document.getElementById("closestTank").innerText = closestTank;
       resultsDiv.style.display = "block";
     }
 
