@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,6 +151,10 @@
   <label>Hours to Ventilate</label>
   <input type="number" id="hours" placeholder="Enter value" step="0.01" />
 
+  <!-- NEW FiO2 input -->
+  <label>FiO₂ (%)</label>
+  <input type="number" id="fio2" placeholder="Enter FiO₂ (20.9 - 100)" step="0.1" min="20.9" max="100" />
+
   <div style="display:flex; justify-content: space-between;">
     <button onclick="calculate()">Calculate</button>
     <button onclick="resetForm()">Reset</button>
@@ -188,7 +193,7 @@
     console.log(message);
   }
 
-  // Tank sizes - updated
+  // Tank sizes
   const tankSizes = [
     { name: "D", value: 425 },
     { name: "E", value: 680 },
@@ -197,14 +202,12 @@
     { name: "H/K", value: 7080 },
   ];
 
-  // Store selected tanks here for custom input
   let selectedTanks = [];
   let totalLitresRequired = 0;
 
   function generateTankCheckboxes() {
     const tankListDiv = document.getElementById("tankList");
     tankListDiv.innerHTML = "";
-    // Sort tanks ascending by value just in case
     const sortedTanks = tankSizes.slice().sort((a, b) => a.value - b.value);
 
     sortedTanks.forEach((tank, index) => {
@@ -233,19 +236,16 @@
     const tankName = checkbox.value;
 
     if (checkbox.checked) {
-      // Add tank if less than 3 selected
       if (selectedTanks.length >= 3) {
         alert("You can select up to 3 tanks only.");
         checkbox.checked = false;
         return;
       }
-      // Find tank by name and add
       const tank = tankSizes.find(t => t.name === tankName);
       if (tank) {
         selectedTanks.push(tank);
       }
     } else {
-      // Remove tank
       selectedTanks = selectedTanks.filter(t => t.name !== tankName);
     }
 
@@ -286,20 +286,24 @@
       const leak = parseFloat(document.getElementById("leak").value) || 0;
       const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
       const hours = parseFloat(document.getElementById("hours").value) || 0;
+      const fio2 = parseFloat(document.getElementById("fio2").value) || 20.9;
 
       logDebug("Inputs received:");
       logDebug("Minute Ventilation: " + minuteVentilation);
       logDebug("Leak: " + leak);
       logDebug("Bias Flow: " + biasFlow);
       logDebug("Hours: " + hours);
+      logDebug("FiO2: " + fio2);
 
-      const litresPerMinute = minuteVentilation + leak + biasFlow;
+      // NEW formula for litres per minute
+      const litresPerMinute =
+        ((fio2 - 20.9) / 79.1) * (minuteVentilation + leak + biasFlow);
+
       logDebug("Litres per Minute = " + litresPerMinute);
 
       const totalLitres = litresPerMinute * hours * 60;
       logDebug("Total Litres = " + totalLitres);
 
-      // Recommended tank = first tank not exceeded
       let selectedTank = "None – too large";
       let selectedTankValue = 0;
       for (let i = 0; i < tankSizes.length; i++) {
@@ -310,7 +314,6 @@
         }
       }
 
-      // Extra litres left in tank
       let extraLitres = 0;
       let alertMessage = "";
       if (selectedTankValue > 0) {
@@ -320,7 +323,6 @@
         alertMessage = "WARNING: Total litres exceed all available tanks!";
       }
 
-      // Two smaller tanks option
       let twoTanksOption = "";
       if (selectedTankValue > 0) {
         const selectedIndex = tankSizes.findIndex(
@@ -355,13 +357,11 @@
         resultsDiv.style.display = "block";
       }
 
-      // Reset selected tanks & checkboxes on each calculation
       selectedTanks = [];
       const checkboxes = document.querySelectorAll("#tankList input[type='checkbox']");
       checkboxes.forEach(cb => (cb.checked = false));
       updateSelectedTanksDisplay();
 
-      // Show custom tank selection only if totalLitres > 0
       totalLitresRequired = totalLitres;
       const customTanksDiv = document.getElementById("customTanksSelection");
       if (totalLitres > 0) {
@@ -379,6 +379,7 @@
     document.getElementById("leak").value = "";
     document.getElementById("biasFlow").value = "";
     document.getElementById("hours").value = "";
+    document.getElementById("fio2").value = "";
 
     document.getElementById("results").style.display = "none";
     document.getElementById("litresPerMinute").innerText = "";
