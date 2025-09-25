@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -167,7 +166,80 @@
 
   window.calculate = function () {
     const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
-    const
+    const leak = parseFloat(document.getElementById("leak").value) || 0;
+    const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
+    const hours = parseFloat(document.getElementById("hours").value) || 0;
+    const fio2 = parseFloat(document.getElementById("fio2").value) || 20.9;
+
+    const litresPerMinute = ((fio2 - 20.9) / 79.1) * (minuteVentilation + leak + biasFlow);
+    const totalLitres = litresPerMinute * hours * 60;
+
+    totalLitresRequired = totalLitres;
+
+    document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
+    document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
+
+    // tank suggestion
+    let selectedTank = "None – too large";
+    let selectedTankValue = 0;
+    for (let i = 0; i < tankSizes.length; i++) {
+      if (totalLitres <= tankSizes[i].value) {
+        selectedTank = tankSizes[i].name;
+        selectedTankValue = tankSizes[i].value;
+        break;
+      }
+    }
+    let extraLitres = selectedTankValue > 0 ? selectedTankValue - totalLitres : 0;
+    let alertMessage = selectedTankValue === 0 ? "WARNING: Total litres exceed all available tanks!" : "";
+    let twoTanksOption = "";
+    if (selectedTankValue > 0) {
+      const selectedIndex = tankSizes.findIndex((t) => t.name === selectedTank);
+      if (selectedIndex > 0) {
+        for (let i = 0; i < selectedIndex; i++) {
+          if (tankSizes[i].value * 2 >= totalLitres) {
+            const spare = tankSizes[i].value * 2 - totalLitres;
+            twoTanksOption = `Two tanks option: Two ${tankSizes[i].name} tanks can supply the volume with ${spare.toFixed(2)} L to spare.`;
+            break;
+          }
+        }
+      }
+    }
+
+    document.getElementById("tankSize").innerText = selectedTank;
+    document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
+    document.getElementById("alertMessage").innerText = alertMessage;
+    document.getElementById("twoTanksOption").innerText = twoTanksOption;
+    document.getElementById("results").style.display = "block";
+    document.getElementById("customTanksSelection").style.display = "block";
+
+    selectedTanks = [];
+    updateCombinedVolume();
+  };
+
+  window.resetForm = function () {
+    ["minuteVentilation", "leak", "biasFlow", "hours", "fio2"].forEach(id => {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("results").style.display = "none";
+    document.getElementById("litresPerMinute").innerText = "";
+    document.getElementById("totalLitres").innerText = "";
+    document.getElementById("tankSize").innerText = "";
+    document.getElementById("extraLitres").innerText = "";
+    document.getElementById("alertMessage").innerText = "";
+    document.getElementById("twoTanksOption").innerText = "";
+    selectedTanks = [];
+    document.querySelectorAll("#tankTable input[type='radio']").forEach(r => (r.checked = false));
+    updateCombinedVolume();
+    document.getElementById("combinedLitres").innerText = "0";
+    document.getElementById("volumeCheckMessage").innerText = "";
+    document.getElementById("customTanksSelection").style.display = "none";
+    document.getElementById("debug").textContent = "Debug Output:\\n";
+  };
+
+  window.onload = generateTankRows;
+</script>
+</body>
+</html>
 
 
 
