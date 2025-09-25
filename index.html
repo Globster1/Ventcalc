@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,174 +82,212 @@
     font-size: 0.9em;
   }
   @media (max-width: 400px) {
-    h1 { font-size: 1.5em; }
-    input, button { font-size: 1em; padding: 10px; }
-    #results, #debug { font-size: 0.85em; padding: 10px; }
-    button { width: 100%; margin-left: 0; margin-top: 10px; }
+    h1 {
+      font-size: 1.5em;
+    }
+    input,
+    button {
+      font-size: 1em;
+      padding: 10px;
+    }
+    #results,
+    #debug {
+      font-size: 0.85em;
+      padding: 10px;
+    }
+    button {
+      width: 100%;
+      margin-left: 0;
+      margin-top: 10px;
+    }
   }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>Ventilator Tank Calculator</h1>
+  <div class="container">
+    <h1>Ventilator Tank Calculator</h1>
 
-  <label>Minute Ventilation (L/min)</label>
-  <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01" />
+    <label>Minute Ventilation (L/min)</label>
+    <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01" />
 
-  <label>Leak (L/min)</label>
-  <input type="number" id="leak" placeholder="Enter value" step="0.01" />
+    <label>Leak (L/min)</label>
+    <input type="number" id="leak" placeholder="Enter value" step="0.01" />
 
-  <label>Bias Flow (L/min)</label>
-  <input type="number" id="biasFlow" placeholder="Enter value" step="0.01" />
+    <label>Bias Flow (L/min)</label>
+    <input type="number" id="biasFlow" placeholder="Enter value" step="0.01" />
 
-  <label>Hours to Ventilate</label>
-  <input type="number" id="hours" placeholder="Enter value" step="0.01" />
+    <label>Hours to Ventilate</label>
+    <input type="number" id="hours" placeholder="Enter value" step="0.01" />
 
-  <div style="display:flex; justify-content: space-between;">
-    <button onclick="calculate()">Calculate</button>
-    <button onclick="resetForm()">Reset</button>
+    <div style="display:flex; justify-content: space-between;">
+      <button onclick="calculate()">Calculate</button>
+      <button onclick="resetForm()">Reset</button>
+    </div>
+
+    <div id="results">
+      <h2>Results</h2>
+      <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
+      <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
+      <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
+      <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
+      <p id="alertMessage" style="color:red; font-weight:bold;"></p>
+      <!-- Two tanks suggestion will be inserted here -->
+    </div>
+
+    <div id="debug">
+      Debug Output:
+    </div>
   </div>
 
-  <div id="results">
-    <h2>Results</h2>
-    <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
-    <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
-    <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-    <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
-    <p id="alertMessage" style="color:red; font-weight:bold;"></p>
-    <!-- Two tanks message will be appended here -->
-  </div>
+  <script>
+    function logDebug(message) {
+      const debugBox = document.getElementById("debug");
+      if (debugBox) debugBox.textContent += message + "\n";
+      console.log(message);
+    }
 
-  <div id="debug">
-    Debug Output:
-  </div>
-</div>
+    window.calculate = function () {
+      logDebug("=== Calculate button clicked ===");
 
-<script>
-function logDebug(message) {
-  const debugBox = document.getElementById("debug");
-  if (debugBox) debugBox.textContent += message + "\n";
-  console.log(message);
-}
+      try {
+        const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
+        const leak = parseFloat(document.getElementById("leak").value) || 0;
+        const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
+        const hours = parseFloat(document.getElementById("hours").value) || 0;
 
-window.calculate = function() {
-  logDebug("=== Calculate button clicked ===");
+        logDebug("Inputs received:");
+        logDebug("Minute Ventilation: " + minuteVentilation);
+        logDebug("Leak: " + leak);
+        logDebug("Bias Flow: " + biasFlow);
+        logDebug("Hours: " + hours);
 
-  try {
-    const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
-    const leak = parseFloat(document.getElementById("leak").value) || 0;
-    const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
-    const hours = parseFloat(document.getElementById("hours").value) || 0;
+        const litresPerMinute = minuteVentilation + leak + biasFlow;
+        logDebug("Litres per Minute = " + litresPerMinute);
 
-    logDebug("Inputs received:");
-    logDebug("Minute Ventilation: " + minuteVentilation);
-    logDebug("Leak: " + leak);
-    logDebug("Bias Flow: " + biasFlow);
-    logDebug("Hours: " + hours);
+        const totalLitres = litresPerMinute * hours * 60;
+        logDebug("Total Litres = " + totalLitres);
 
-    const litresPerMinute = minuteVentilation + leak + biasFlow;
-    logDebug("Litres per Minute = " + litresPerMinute);
+        const tankSizes = [
+          { name: "D", value: 425 },
+          { name: "DJ", value: 640 },
+          { name: "E", value: 680 },
+          { name: "M", value: 1738 },
+          { name: "M/MM/M122", value: 3455 },
+          { name: "H/K", value: 7080 },
+        ];
 
-    const totalLitres = litresPerMinute * hours * 60;
-    logDebug("Total Litres = " + totalLitres);
+        // Find smallest single tank that can supply totalLitres
+        let selectedTank = "None – too large";
+        let selectedTankValue = 0;
+        let selectedTankIndex = -1;
+        for (let i = 0; i < tankSizes.length; i++) {
+          if (totalLitres <= tankSizes[i].value) {
+            selectedTank = tankSizes[i].name;
+            selectedTankValue = tankSizes[i].value;
+            selectedTankIndex = i;
+            break;
+          }
+        }
 
-    const tankSizes = [
-      { name: "D", value: 425 },
-      { name: "DJ", value: 640 },
-      { name: "E", value: 680 },
-      { name: "M", value: 1738 },
-      { name: "M/MM/M122", value: 3455 },
-      { name: "H/K", value: 7080 }
-    ];
+        let extraLitres = 0;
+        let alertMessage = "";
+        if (selectedTankValue > 0) {
+          extraLitres = selectedTankValue - totalLitres;
+        } else {
+          alertMessage = "WARNING: Total litres exceed all available tanks!";
+        }
 
-    // Find smallest single tank that can supply totalLitres
-    let selectedTank = "None – too large";
-    let selectedTankValue = 0;
-    for (let i = 0; i < tankSizes.length; i++) {
-      if (totalLitres <= tankSizes[i].value) {
-        selectedTank = tankSizes[i].name;
-        selectedTankValue = tankSizes[i].value;
-        break;
+        // Find two-tank options
+        let twoTankOptions = [];
+        if (selectedTankValue > 0) {
+          // Two smaller tanks than single tank recommended
+          const smallerTanks = tankSizes.slice(0, selectedTankIndex);
+          smallerTanks.forEach((tank) => {
+            if (totalLitres <= tank.value * 2) {
+              const spare = tank.value * 2 - totalLitres;
+              twoTankOptions.push({ name: tank.name, spare });
+            }
+          });
+        }
+
+        // If no single tank fits, try two tanks of any size
+        let twoTanksMessage = "";
+        if (alertMessage) {
+          const twoTankOptionsAll = tankSizes
+            .filter((tank) => totalLitres <= tank.value * 2)
+            .map((tank) => {
+              return {
+                name: tank.name,
+                spare: tank.value * 2 - totalLitres,
+              };
+            });
+
+          if (twoTankOptionsAll.length > 0) {
+            twoTanksMessage = "Two identical tanks that can supply the required volume:<br>";
+            twoTanksMessage += twoTankOptionsAll
+              .map((tank) => `${tank.name} (extra litres: ${tank.spare.toFixed(2)} L)`)
+              .join(", ");
+          } else {
+            twoTanksMessage = "Even two identical tanks cannot supply the required volume.";
+          }
+        } else if (twoTankOptions.length > 0) {
+          twoTanksMessage = "Two identical smaller tanks that can supply the required volume:<br>";
+          twoTanksMessage += twoTankOptions
+            .map((tank) => `${tank.name} (extra litres: ${tank.spare.toFixed(2)} L)`)
+            .join(", ");
+        }
+
+        logDebug("Selected Tank = " + selectedTank);
+        logDebug("Extra Litres Left = " + extraLitres);
+        if (alertMessage) logDebug(alertMessage);
+        if (twoTanksMessage) logDebug(twoTanksMessage.replace(/<br>/g, "\n"));
+
+        const resultsDiv = document.getElementById("results");
+        if (resultsDiv) {
+          document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
+          document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
+          document.getElementById("tankSize").innerText = selectedTank;
+          document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
+          document.getElementById("alertMessage").innerText = alertMessage;
+
+          let twoTanksElement = document.getElementById("twoTanksMessage");
+          if (!twoTanksElement) {
+            twoTanksElement = document.createElement("p");
+            twoTanksElement.id = "twoTanksMessage";
+            twoTanksElement.style.fontWeight = "bold";
+            twoTanksElement.style.marginTop = "10px";
+            resultsDiv.appendChild(twoTanksElement);
+          }
+          twoTanksElement.innerHTML = twoTanksMessage;
+
+          resultsDiv.style.display = "block";
+        }
+      } catch (error) {
+        logDebug("ERROR: " + error.message);
       }
-    }
+    };
 
-    let extraLitres = 0;
-    let alertMessage = "";
-    if (selectedTankValue > 0) {
-      extraLitres = selectedTankValue - totalLitres;
-    } else {
-      alertMessage = "WARNING: Total litres exceed all available tanks!";
-    }
+    window.resetForm = function () {
+      document.getElementById("minuteVentilation").value = "";
+      document.getElementById("leak").value = "";
+      document.getElementById("biasFlow").value = "";
+      document.getElementById("hours").value = "";
 
-    logDebug("Selected Tank = " + selectedTank);
-    logDebug("Extra Litres Left = " + extraLitres);
-    if (alertMessage) logDebug(alertMessage);
+      document.getElementById("results").style.display = "none";
+      document.getElementById("litresPerMinute").innerText = "";
+      document.getElementById("totalLitres").innerText = "";
+      document.getElementById("tankSize").innerText = "";
+      document.getElementById("extraLitres").innerText = "";
+      document.getElementById("alertMessage").innerText = "";
 
-    // Find all tanks where two tanks can supply totalLitres
-    const twoTankOptions = tankSizes
-      .filter(tank => totalLitres <= tank.value * 2)
-      .map(tank => tank.name);
-
-    logDebug("Two tanks that can supply the volume: " + (twoTankOptions.length ? twoTankOptions.join(", ") : "None"));
-
-    // Prepare message for two tank options
-    let twoTanksMessage = "";
-    if (alertMessage) {
-      if (twoTankOptions.length > 0) {
-        twoTanksMessage = `Two identical tanks that can supply the required volume: ${twoTankOptions.join(", ")}.`;
-      } else {
-        twoTanksMessage = "Even two identical tanks cannot supply the required volume.";
+      const twoTanksElement = document.getElementById("twoTanksMessage");
+      if (twoTanksElement) {
+        twoTanksElement.innerHTML = "";
       }
-    }
 
-    // Update the UI results
-    const resultsDiv = document.getElementById("results");
-    if (resultsDiv) {
-      document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
-      document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
-      document.getElementById("tankSize").innerText = selectedTank;
-      document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
-      document.getElementById("alertMessage").innerText = alertMessage;
-
-      // Add or update the two tanks message paragraph
-      let twoTanksElement = document.getElementById("twoTanksMessage");
-      if (!twoTanksElement) {
-        twoTanksElement = document.createElement("p");
-        twoTanksElement.id = "twoTanksMessage";
-        twoTanksElement.style.fontWeight = "bold";
-        twoTanksElement.style.marginTop = "10px";
-        resultsDiv.appendChild(twoTanksElement);
-      }
-      twoTanksElement.innerText = twoTanksMessage;
-
-      resultsDiv.style.display = "block";
-    }
-  } catch (error) {
-    logDebug("ERROR: " + error.message);
-  }
-};
-
-window.resetForm = function() {
-  document.getElementById("minuteVentilation").value = "";
-  document.getElementById("leak").value = "";
-  document.getElementById("biasFlow").value = "";
-  document.getElementById("hours").value = "";
-
-  document.getElementById("results").style.display = "none";
-  document.getElementById("litresPerMinute").innerText = "";
-  document.getElementById("totalLitres").innerText = "";
-  document.getElementById("tankSize").innerText = "";
-  document.getElementById("extraLitres").innerText = "";
-  document.getElementById("alertMessage").innerText = "";
-
-  const twoTanksElement = document.getElementById("twoTanksMessage");
-  if (twoTanksElement) {
-    twoTanksElement.innerText = "";
-  }
-
-  document.getElementById("debug").textContent = "Debug Output:\n";
-};
-</script>
+      document.getElementById("debug").textContent = "Debug Output:\n";
+    };
+  </script>
 </body>
 </html>
 
