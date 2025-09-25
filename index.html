@@ -29,7 +29,7 @@
     margin-top: 15px;
     font-weight: bold;
   }
-  input {
+  input[type="number"] {
     width: 100%;
     padding: 12px;
     font-size: 1em;
@@ -91,11 +91,32 @@
   #customTanksSelection h3 {
     margin-top: 0;
   }
+  #tankList {
+    margin-top: 10px;
+  }
+  #tankList label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  #tankList input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+  }
+  #combinedLitresDisplay {
+    margin-top: 10px;
+    font-weight: bold;
+  }
+  #volumeCheckMessage {
+    margin-top: 10px;
+    font-weight: bold;
+  }
   @media (max-width: 400px) {
     h1 {
       font-size: 1.5em;
     }
-    input,
+    input[type="number"],
     button {
       font-size: 1em;
       padding: 10px;
@@ -146,22 +167,13 @@
 
   <div id="customTanksSelection">
     <h3>Select Tanks (up to 3)</h3>
-    <p>Enter tank name (e.g. D, DJ, E, M, M/MM/M122, H/K):</p>
-    <input
-      type="text"
-      id="tankNameInput"
-      placeholder="Enter tank name"
-      style="padding: 8px; font-size: 1em; width: 70%;"
-    />
-    <button onclick="addTank()">Select</button>
-
-    <div id="selectedTanksDisplay" style="margin-top: 15px;">
-      <strong>Selected Tanks:</strong> <span id="selectedTanksList">None</span>
+    <div id="tankList">
+      <!-- Tank checkboxes will be generated here -->
     </div>
-    <div style="margin-top: 10px;">
-      <strong>Total Combined Litres:</strong> <span id="combinedLitres">0</span> L
+    <div id="combinedLitresDisplay">
+      Total Combined Litres: <span id="combinedLitres">0</span> L
     </div>
-    <div id="volumeCheckMessage" style="margin-top: 10px; font-weight: bold;"></div>
+    <div id="volumeCheckMessage"></div>
   </div>
 
   <div id="debug">
@@ -189,6 +201,84 @@
   // Store selected tanks here for custom input
   let selectedTanks = [];
   let totalLitresRequired = 0;
+
+  function generateTankCheckboxes() {
+    const tankListDiv = document.getElementById("tankList");
+    tankListDiv.innerHTML = "";
+    // Sort tanks ascending by value just in case
+    const sortedTanks = tankSizes.slice().sort((a, b) => a.value - b.value);
+
+    sortedTanks.forEach((tank, index) => {
+      const label = document.createElement("label");
+      label.htmlFor = `tankCheckbox_${index}`;
+      label.title = `${tank.name} - ${tank.value} L`;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.id = `tankCheckbox_${index}`;
+      checkbox.value = tank.name;
+
+      checkbox.addEventListener("change", onTankCheckboxChange);
+
+      const span = document.createElement("span");
+      span.innerText = `${tank.name} (${tank.value} L)`;
+
+      label.appendChild(checkbox);
+      label.appendChild(span);
+      tankListDiv.appendChild(label);
+    });
+  }
+
+  function onTankCheckboxChange(event) {
+    const checkbox = event.target;
+    const tankName = checkbox.value;
+
+    if (checkbox.checked) {
+      // Add tank if less than 3 selected
+      if (selectedTanks.length >= 3) {
+        alert("You can select up to 3 tanks only.");
+        checkbox.checked = false;
+        return;
+      }
+      // Find tank by name and add
+      const tank = tankSizes.find(t => t.name === tankName);
+      if (tank) {
+        selectedTanks.push(tank);
+      }
+    } else {
+      // Remove tank
+      selectedTanks = selectedTanks.filter(t => t.name !== tankName);
+    }
+
+    updateSelectedTanksDisplay();
+    updateCombinedVolume();
+  }
+
+  function updateSelectedTanksDisplay() {
+    // Just updates combined volume display & message, no separate list needed
+    const combinedLitresSpan = document.getElementById("combinedLitres");
+    const messageDiv = document.getElementById("volumeCheckMessage");
+
+    const combinedVolume = selectedTanks.reduce((sum, tank) => sum + tank.value, 0);
+    combinedLitresSpan.innerText = combinedVolume.toFixed(2);
+
+    if (totalLitresRequired > 0) {
+      if (combinedVolume >= totalLitresRequired) {
+        messageDiv.style.color = "green";
+        messageDiv.innerText = "Selected tanks CAN supply the required volume.";
+      } else {
+        messageDiv.style.color = "red";
+        messageDiv.innerText = "Selected tanks CANNOT supply the required volume.";
+      }
+    } else {
+      messageDiv.innerText = "";
+    }
+  }
+
+  function updateCombinedVolume() {
+    // This is handled by updateSelectedTanksDisplay already
+    updateSelectedTanksDisplay();
+  }
 
   window.calculate = function () {
     logDebug("=== Calculate button clicked ===");
@@ -269,11 +359,11 @@
         resultsDiv.style.display = "block";
       }
 
-      // Reset custom tank selection inputs on every calculation
+      // Reset selected tanks & checkboxes on each calculation
       selectedTanks = [];
+      const checkboxes = document.querySelectorAll("#tankList input[type='checkbox']");
+      checkboxes.forEach(cb => (cb.checked = false));
       updateSelectedTanksDisplay();
-      document.getElementById("combinedLitres").innerText = "0";
-      document.getElementById("volumeCheckMessage").innerText = "";
 
       // Show custom tank selection only if totalLitres > 0
       totalLitresRequired = totalLitres;
@@ -304,71 +394,21 @@
 
     document.getElementById("debug").textContent = "Debug Output:\n";
 
-    // Reset custom tanks input
+    // Reset selected tanks & checkboxes
     selectedTanks = [];
+    const checkboxes = document.querySelectorAll("#tankList input[type='checkbox']");
+    checkboxes.forEach(cb => (cb.checked = false));
     updateSelectedTanksDisplay();
+
     document.getElementById("combinedLitres").innerText = "0";
     document.getElementById("volumeCheckMessage").innerText = "";
     document.getElementById("customTanksSelection").style.display = "none";
   };
 
-  function addTank() {
-    const input = document.getElementById("tankNameInput");
-    const tankName = input.value.trim();
-    const messageDiv = document.getElementById("volumeCheckMessage");
-
-    // Find tank by name (case-insensitive)
-    const tank = tankSizes.find(
-      (t) => t.name.toLowerCase() === tankName.toLowerCase()
-    );
-
-    if (!tank) {
-      alert("Tank name not recognized. Please enter a valid tank name.");
-      input.value = "";
-      return;
-    }
-
-    if (selectedTanks.length >= 3) {
-      alert("You can select up to 3 tanks only.");
-      input.value = "";
-      return;
-    }
-
-    // Add tank to selectedTanks
-    selectedTanks.push(tank);
-    input.value = "";
-
-    updateSelectedTanksDisplay();
-
-    // Check combined volume against total required
-    const combinedVolume = selectedTanks.reduce(
-      (sum, tank) => sum + tank.value,
-      0
-    );
-    const combinedLitresSpan = document.getElementById("combinedLitres");
-    combinedLitresSpan.innerText = combinedVolume.toFixed(2);
-
-    if (combinedVolume >= totalLitresRequired) {
-      messageDiv.style.color = "green";
-      messageDiv.innerText =
-        "Selected tanks CAN supply the required volume.";
-    } else {
-      messageDiv.style.color = "red";
-      messageDiv.innerText =
-        "Selected tanks CANNOT supply the required volume.";
-    }
-  }
-
-  function updateSelectedTanksDisplay() {
-    const listSpan = document.getElementById("selectedTanksList");
-    if (selectedTanks.length === 0) {
-      listSpan.innerText = "None";
-    } else {
-      listSpan.innerText = selectedTanks
-        .map((tank) => tank.name)
-        .join(", ");
-    }
-  }
+  // Initialize tank checkboxes on page load
+  window.onload = function () {
+    generateTankCheckboxes();
+  };
 </script>
 </body>
 </html>
