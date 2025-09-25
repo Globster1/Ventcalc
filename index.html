@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,7 +116,7 @@
     <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
     <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
     <p id="alertMessage" style="color:red; font-weight:bold;"></p>
-    <!-- Two tanks message will be inserted here dynamically -->
+    <!-- Two tanks message will be appended here -->
   </div>
 
   <div id="debug">
@@ -163,7 +161,7 @@ window.calculate = function() {
       { name: "H/K", value: 7080 }
     ];
 
-    // Recommended tank = first tank not exceeded
+    // Find smallest single tank that can supply totalLitres
     let selectedTank = "None – too large";
     let selectedTankValue = 0;
     for (let i = 0; i < tankSizes.length; i++) {
@@ -174,13 +172,11 @@ window.calculate = function() {
       }
     }
 
-    // Extra litres left in tank
     let extraLitres = 0;
     let alertMessage = "";
     if (selectedTankValue > 0) {
       extraLitres = selectedTankValue - totalLitres;
     } else {
-      extraLitres = 0; // Show 0 when no tank fits
       alertMessage = "WARNING: Total litres exceed all available tanks!";
     }
 
@@ -188,24 +184,22 @@ window.calculate = function() {
     logDebug("Extra Litres Left = " + extraLitres);
     if (alertMessage) logDebug(alertMessage);
 
-    // Check if two identical tanks can provide the required amount
+    // Find all tanks where two tanks can supply totalLitres
+    const twoTankOptions = tankSizes
+      .filter(tank => totalLitres <= tank.value * 2)
+      .map(tank => tank.name);
+
+    logDebug("Two tanks that can supply the volume: " + (twoTankOptions.length ? twoTankOptions.join(", ") : "None"));
+
+    // Prepare message for two tank options
     let twoTanksMessage = "";
-    if (selectedTankValue > 0) {
-      if (totalLitres <= selectedTankValue * 2) {
-        twoTanksMessage = `Two tanks of size ${selectedTank} CAN provide the required volume.`;
+    if (alertMessage) {
+      if (twoTankOptions.length > 0) {
+        twoTanksMessage = `Two identical tanks that can supply the required volume: ${twoTankOptions.join(", ")}.`;
       } else {
-        twoTanksMessage = `Two tanks of size ${selectedTank} CANNOT provide the required volume.`;
-      }
-    } else {
-      // If no single tank fits, check for the largest tank if two of them fit
-      const largestTank = tankSizes[tankSizes.length - 1];
-      if (totalLitres <= largestTank.value * 2) {
-        twoTanksMessage = `Two tanks of size ${largestTank.name} CAN provide the required volume.`;
-      } else {
-        twoTanksMessage = `Even two tanks of size ${largestTank.name} CANNOT provide the required volume.`;
+        twoTanksMessage = "Even two identical tanks cannot supply the required volume.";
       }
     }
-    logDebug(twoTanksMessage);
 
     // Update the UI results
     const resultsDiv = document.getElementById("results");
@@ -229,7 +223,6 @@ window.calculate = function() {
 
       resultsDiv.style.display = "block";
     }
-
   } catch (error) {
     logDebug("ERROR: " + error.message);
   }
@@ -248,8 +241,14 @@ window.resetForm = function() {
   document.getElementById("extraLitres").innerText = "";
   document.getElementById("alertMessage").innerText = "";
 
+  const twoTanksElement = document.getElementById("twoTanksMessage");
+  if (twoTanksElement) {
+    twoTanksElement.innerText = "";
+  }
+
   document.getElementById("debug").textContent = "Debug Output:\n";
 };
 </script>
 </body>
 </html>
+
