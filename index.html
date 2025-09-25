@@ -1,8 +1,10 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ventilator Tank Calculator</title>
 <style>
   body {
@@ -93,16 +95,16 @@
   <h1>Ventilator Tank Calculator</h1>
 
   <label>Minute Ventilation (L/min)</label>
-  <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01">
+  <input type="number" id="minuteVentilation" placeholder="Enter value" step="0.01" />
 
   <label>Leak (L/min)</label>
-  <input type="number" id="leak" placeholder="Enter value" step="0.01">
+  <input type="number" id="leak" placeholder="Enter value" step="0.01" />
 
   <label>Bias Flow (L/min)</label>
-  <input type="number" id="biasFlow" placeholder="Enter value" step="0.01">
+  <input type="number" id="biasFlow" placeholder="Enter value" step="0.01" />
 
   <label>Hours to Ventilate</label>
-  <input type="number" id="hours" placeholder="Enter value" step="0.01">
+  <input type="number" id="hours" placeholder="Enter value" step="0.01" />
 
   <div style="display:flex; justify-content: space-between;">
     <button onclick="calculate()">Calculate</button>
@@ -116,6 +118,7 @@
     <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
     <p><strong>Extra Litres Left in Tank:</strong> <span id="extraLitres"></span> L</p>
     <p id="alertMessage" style="color:red; font-weight:bold;"></p>
+    <!-- Two tanks message will be inserted here dynamically -->
   </div>
 
   <div id="debug">
@@ -185,6 +188,26 @@ window.calculate = function() {
     logDebug("Extra Litres Left = " + extraLitres);
     if (alertMessage) logDebug(alertMessage);
 
+    // Check if two identical tanks can provide the required amount
+    let twoTanksMessage = "";
+    if (selectedTankValue > 0) {
+      if (totalLitres <= selectedTankValue * 2) {
+        twoTanksMessage = `Two tanks of size ${selectedTank} CAN provide the required volume.`;
+      } else {
+        twoTanksMessage = `Two tanks of size ${selectedTank} CANNOT provide the required volume.`;
+      }
+    } else {
+      // If no single tank fits, check for the largest tank if two of them fit
+      const largestTank = tankSizes[tankSizes.length - 1];
+      if (totalLitres <= largestTank.value * 2) {
+        twoTanksMessage = `Two tanks of size ${largestTank.name} CAN provide the required volume.`;
+      } else {
+        twoTanksMessage = `Even two tanks of size ${largestTank.name} CANNOT provide the required volume.`;
+      }
+    }
+    logDebug(twoTanksMessage);
+
+    // Update the UI results
     const resultsDiv = document.getElementById("results");
     if (resultsDiv) {
       document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
@@ -192,13 +215,25 @@ window.calculate = function() {
       document.getElementById("tankSize").innerText = selectedTank;
       document.getElementById("extraLitres").innerText = extraLitres.toFixed(2);
       document.getElementById("alertMessage").innerText = alertMessage;
+
+      // Add or update the two tanks message paragraph
+      let twoTanksElement = document.getElementById("twoTanksMessage");
+      if (!twoTanksElement) {
+        twoTanksElement = document.createElement("p");
+        twoTanksElement.id = "twoTanksMessage";
+        twoTanksElement.style.fontWeight = "bold";
+        twoTanksElement.style.marginTop = "10px";
+        resultsDiv.appendChild(twoTanksElement);
+      }
+      twoTanksElement.innerText = twoTanksMessage;
+
       resultsDiv.style.display = "block";
     }
 
   } catch (error) {
     logDebug("ERROR: " + error.message);
   }
-}
+};
 
 window.resetForm = function() {
   document.getElementById("minuteVentilation").value = "";
@@ -218,4 +253,3 @@ window.resetForm = function() {
 </script>
 </body>
 </html>
-
