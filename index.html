@@ -188,12 +188,11 @@
     console.log(message);
   }
 
-  // Tank sizes - keep in sync with rest of code
+  // Tank sizes - updated
   const tankSizes = [
     { name: "D", value: 425 },
-    { name: "DJ", value: 640 },
     { name: "E", value: 680 },
-    { name: "M", value: 1738 },
+    { name: "M60", value: 1738 },
     { name: "M/MM/M122", value: 3455 },
     { name: "H/K", value: 7080 },
   ];
@@ -255,7 +254,6 @@
   }
 
   function updateSelectedTanksDisplay() {
-    // Just updates combined volume display & message, no separate list needed
     const combinedLitresSpan = document.getElementById("combinedLitres");
     const messageDiv = document.getElementById("volumeCheckMessage");
 
@@ -276,7 +274,6 @@
   }
 
   function updateCombinedVolume() {
-    // This is handled by updateSelectedTanksDisplay already
     updateSelectedTanksDisplay();
   }
 
@@ -319,14 +316,13 @@
       if (selectedTankValue > 0) {
         extraLitres = selectedTankValue - totalLitres;
       } else {
-        extraLitres = 0; // Show 0 when no tank fits
+        extraLitres = 0;
         alertMessage = "WARNING: Total litres exceed all available tanks!";
       }
 
       // Two smaller tanks option
       let twoTanksOption = "";
       if (selectedTankValue > 0) {
-        // Find two identical tanks smaller than the selected tank that can supply totalLitres
         const selectedIndex = tankSizes.findIndex(
           (t) => t.name === selectedTank
         );
@@ -394,7 +390,6 @@
 
     document.getElementById("debug").textContent = "Debug Output:\n";
 
-    // Reset selected tanks & checkboxes
     selectedTanks = [];
     const checkboxes = document.querySelectorAll("#tankList input[type='checkbox']");
     checkboxes.forEach(cb => (cb.checked = false));
@@ -405,7 +400,6 @@
     document.getElementById("customTanksSelection").style.display = "none";
   };
 
-  // Initialize tank checkboxes on page load
   window.onload = function () {
     generateTankCheckboxes();
   };
