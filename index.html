@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Oxygen Tank Duration Calculator</title>
 
-<!-- iOS Icons -->
+<!-- iOS Home Screen Icons -->
 <link rel="apple-touch-icon" sizes="120x120" href="ventcalc_icons/icon-120.png">
 <link rel="apple-touch-icon" sizes="152x152" href="ventcalc_icons/icon-152.png">
 <link rel="apple-touch-icon" sizes="167x167" href="ventcalc_icons/icon-167.png">
@@ -23,15 +22,12 @@ html {
   font-size: 110%;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background: #f5f5f5;
+  background: #f8f8f8;
   margin: 0;
   padding: 0;
+  font-size: 1rem;
 }
 
 /* Fixed header image */
@@ -41,96 +37,118 @@ body {
   left: 0;
   width: 100%;
   height: 180px;
-  object-fit: contain;
-  background: #fff;
+  object-fit: cover;
   z-index: 1000;
-  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
-/* Push content below image */
+/* Main container */
 .container {
-  max-width: 500px;
-  margin: auto;
-  padding: 20px;
+  max-width: 420px;
+  margin: 180px auto 0 auto;
+  padding: 1.5rem;
   background: #fff;
   min-height: 100vh;
-
-  margin-top: 180px; /* Same as image height */
 }
 
-/* Headings */
-h1 {
-  font-size: 1.8em;
+/* Header */
+header {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 1.5rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #333;
 }
 
 /* Inputs */
 label {
   display: block;
-  margin-top: 15px;
-  font-weight: bold;
+  margin-top: 0.75rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
 }
 
 input[type="number"] {
   width: 100%;
-  padding: 12px;
-  margin-top: 5px;
-  font-size: 1em;
+  padding: 0.75rem;
+  font-size: 1rem;
+
+  border: 2px solid #444;
+  border-radius: 0.5rem;
+
+  margin-top: 0.3rem;
+  background: #fff;
+  outline: none;
+
+  min-height: 3rem;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="number"]:focus {
+  border-color: #007aff;
+  box-shadow: 0 0 0.3rem rgba(0,122,255,0.5);
 }
 
 /* Buttons */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
 button {
-  padding: 15px;
-  font-size: 1.1em;
+  flex: 1;
+  padding: 1rem;
+  font-size: 1.2rem;
+  background: #007aff;
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 0.75rem;
   cursor: pointer;
-  width: 48%;
+  transition: background 0.3s;
 }
 
-button:first-of-type {
-  background: #007BFF;
-  color: #fff;
-}
-
-button:first-of-type:active {
-  background: #0056b3;
-}
-
-button:last-of-type {
+button:last-child {
   background: #6c757d;
-  color: #fff;
-  margin-left: 4%;
 }
 
-button:last-of-type:active {
-  background: #5a6268;
+button:hover {
+  opacity: 0.9;
 }
 
 /* Results */
-#results,
-#customTanksSelection {
-  margin-top: 25px;
-  padding: 15px;
-  border-radius: 8px;
+#results, #customTanksSelection {
+  margin-top: 1.25rem;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
   display: none;
 }
 
 #results {
-  background: #e9ecef;
-  font-size: 1em;
+  background: #eaf5ea;
 }
 
 #customTanksSelection {
   background: #e0e7ff;
 }
 
+#results h2 {
+  margin-top: 0;
+  color: #2b5d2e;
+  font-size: 1.4rem;
+}
+
 /* Tank selector */
 .tank-row {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .tank-name {
@@ -152,55 +170,23 @@ button:last-of-type:active {
 }
 
 .tank-buttons label.selected {
-  background-color: #007BFF;
+  background-color: #007aff;
   color: #fff;
-  border-color: #0056b3;
-}
-
-#combinedLitresDisplay,
-#volumeCheckMessage {
-  margin-top: 10px;
-  font-weight: bold;
+  border-color: #005bb5;
 }
 
 /* Debug */
 #debug {
-  margin-top: 20px;
+  margin-top: 1.25rem;
   background: #222;
   color: #0f0;
-  padding: 15px;
+  padding: 1rem;
   font-family: monospace;
   white-space: pre-wrap;
   max-height: 200px;
   overflow-y: auto;
-  border-radius: 8px;
-  font-size: 0.9em;
-}
-
-/* Mobile */
-@media (max-width: 400px) {
-
-  .top-image {
-    height: 150px;
-  }
-
-  .container {
-    margin-top: 150px;
-  }
-
-  h1 {
-    font-size: 1.5em;
-  }
-
-  input,
-  button {
-    font-size: 1em;
-    padding: 10px;
-    width: 100%;
-    margin-left: 0;
-    margin-top: 10px;
-  }
-
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
 }
 
 </style>
@@ -208,12 +194,14 @@ button:last-of-type:active {
 
 <body>
 
-<!-- Fixed Header Image -->
-<img src="header.png" alt="Oxygen Transport" class="top-image">
+<!-- Top Image -->
+<img src="header.png" alt="Header Image" class="top-image">
 
 <div class="container">
 
-<h1>Oxygen Tank Duration Calculator</h1>
+<header>
+  <h1>Oxygen Tank Duration Calculator</h1>
+</header>
 
 <label>Minute Ventilation (L/min)</label>
 <input type="number" id="minuteVentilation" step="0.01">
@@ -230,46 +218,31 @@ button:last-of-type:active {
 <label>FiO₂ (%)</label>
 <input type="number" id="fio2" step="0.1" min="20.9" max="100">
 
-<div style="display:flex; justify-content: space-between;">
+<div class="button-row">
   <button onclick="calculate()">Calculate</button>
   <button onclick="resetForm()">Reset</button>
 </div>
 
 <div id="results">
-
-<h2>Results</h2>
-
-<p><strong>Litres per Minute:</strong>
-<span id="litresPerMinute"></span> L/min</p>
-
-<p><strong>Total Litres:</strong>
-<span id="totalLitres"></span> L</p>
-
-<p><strong>Recommended Tank:</strong>
-<span id="tankSize"></span></p>
-
-<p><strong>Extra Litres Left:</strong>
-<span id="extraLitres"></span> L</p>
-
-<p id="alertMessage" style="color:red;font-weight:bold;"></p>
-
-<p id="twoTanksOption" style="font-weight:bold;"></p>
-
+  <h2>Results</h2>
+  <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
+  <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
+  <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
+  <p><strong>Extra Litres Left:</strong> <span id="extraLitres"></span> L</p>
+  <p id="alertMessage" style="color:red;font-weight:bold;"></p>
+  <p id="twoTanksOption" style="font-weight:bold;"></p>
 </div>
 
 <div id="customTanksSelection">
+  <h3>Select Tanks (up to 3)</h3>
+  <div id="tankList"></div>
 
-<h3>Select Tanks (up to 3)</h3>
+  <div>
+    Total Combined Litres:
+    <span id="combinedLitres">0</span> L
+  </div>
 
-<div id="tankList"></div>
-
-<div id="combinedLitresDisplay">
-Total Combined Litres:
-<span id="combinedLitres">0</span> L
-</div>
-
-<div id="volumeCheckMessage"></div>
-
+  <div id="volumeCheckMessage"></div>
 </div>
 
 <div id="debug">Debug Output:
@@ -277,17 +250,14 @@ Total Combined Litres:
 
 </div>
 
-
 <script>
-
-/* --- ORIGINAL LOGIC UNCHANGED --- */
 
 const tankSizes = [
   { name: "D", value: 425 },
   { name: "E", value: 680 },
   { name: "M60", value: 1738 },
   { name: "M/MM/M122", value: 3455 },
-  { name: "H/K", value: 7080 },
+  { name: "H/K", value: 7080 }
 ];
 
 let selectedTanks = [];
@@ -321,8 +291,6 @@ function generateTankCheckboxes() {
 
       const label = document.createElement("label");
       label.textContent = "x";
-
-      label.dataset.index = i;
       label.dataset.tankName = tank.name;
       label.dataset.tankValue = tank.value;
 
@@ -333,6 +301,7 @@ function generateTankCheckboxes() {
 
     rowDiv.appendChild(buttonsDiv);
     tankListDiv.appendChild(rowDiv);
+
   });
 }
 
@@ -372,7 +341,7 @@ function updateSelectedTanksDisplay() {
   const combinedSpan = document.getElementById("combinedLitres");
   const messageDiv = document.getElementById("volumeCheckMessage");
 
-  let combined = selectedTanks.reduce((s,t)=>s+t.value,0);
+  const combined = selectedTanks.reduce((s,t)=>s+t.value,0);
 
   combinedSpan.innerText = combined.toFixed(2);
 
@@ -383,15 +352,14 @@ function updateSelectedTanksDisplay() {
       const remaining = combined - totalLitresRequired;
 
       messageDiv.style.color = "green";
-
       messageDiv.innerText =
-      `Selected tanks CAN supply the required volume with ${remaining.toFixed(2)} liters remaining.`;
+        `Selected tanks CAN supply the required volume with ${remaining.toFixed(2)} L remaining.`;
 
     } else {
 
       messageDiv.style.color = "red";
-      messageDiv.innerText = "Selected tanks CANNOT supply the required volume.";
-
+      messageDiv.innerText =
+        "Selected tanks CANNOT supply the required volume.";
     }
 
   } else {
@@ -401,65 +369,120 @@ function updateSelectedTanksDisplay() {
 
 function calculate() {
 
-  const minuteVent = +document.getElementById("minuteVentilation").value || 0;
-  const leak = +document.getElementById("leak").value || 0;
-  const bias = +document.getElementById("biasFlow").value || 0;
-  const hours = +document.getElementById("hours").value || 0;
-  const fio2 = +document.getElementById("fio2").value || 20.9;
+  const minuteVent =
+    parseFloat(document.getElementById("minuteVentilation").value) || 0;
 
-  const lpm = ((fio2-20.9)/79.1)*(minuteVent+leak+bias);
-  const total = lpm*hours*60;
+  const leak =
+    parseFloat(document.getElementById("leak").value) || 0;
 
-  totalLitresRequired = total;
+  const biasFlow =
+    parseFloat(document.getElementById("biasFlow").value) || 0;
 
-  document.getElementById("litresPerMinute").innerText = lpm.toFixed(2);
-  document.getElementById("totalLitres").innerText = total.toFixed(2);
+  const hours =
+    parseFloat(document.getElementById("hours").value) || 0;
 
-  let chosen = "None – too large";
-  let chosenVal = 0;
+  const fio2 =
+    parseFloat(document.getElementById("fio2").value) || 20.9;
 
-  for (let t of tankSizes) {
-    if (total <= t.value) {
-      chosen = t.name;
-      chosenVal = t.value;
+  const litresPerMinute =
+    ((fio2 - 20.9)/79.1) * (minuteVent + leak + biasFlow);
+
+  const totalLitres =
+    litresPerMinute * hours * 60;
+
+  totalLitresRequired = totalLitres;
+
+  document.getElementById("litresPerMinute").innerText =
+    litresPerMinute.toFixed(2);
+
+  document.getElementById("totalLitres").innerText =
+    totalLitres.toFixed(2);
+
+  let selectedTank = "None – too large";
+  let selectedTankValue = 0;
+
+  for (let tank of tankSizes) {
+
+    if (totalLitres <= tank.value) {
+      selectedTank = tank.name;
+      selectedTankValue = tank.value;
       break;
     }
   }
 
-  const extra = chosenVal ? chosenVal-total : 0;
+  const extra =
+    selectedTankValue ? selectedTankValue - totalLitres : 0;
 
-  document.getElementById("tankSize").innerText = chosen;
+  const alertMsg =
+    selectedTankValue ? "" : "WARNING: Exceeds all tanks!";
+
+  let twoTanks = "";
+
+  if (selectedTankValue) {
+
+    const index =
+      tankSizes.findIndex(t => t.name === selectedTank);
+
+    for (let i = 0; i < index; i++) {
+
+      if (tankSizes[i].value * 2 >= totalLitres) {
+
+        const spare =
+          tankSizes[i].value * 2 - totalLitres;
+
+        twoTanks =
+          `Two ${tankSizes[i].name} tanks can supply with ${spare.toFixed(2)} L spare.`;
+
+        break;
+      }
+    }
+  }
+
+  document.getElementById("tankSize").innerText = selectedTank;
   document.getElementById("extraLitres").innerText = extra.toFixed(2);
-
-  document.getElementById("alertMessage").innerText =
-    chosenVal ? "" : "WARNING: Total exceeds all tanks!";
+  document.getElementById("alertMessage").innerText = alertMsg;
+  document.getElementById("twoTanksOption").innerText = twoTanks;
 
   document.getElementById("results").style.display = "block";
 
   selectedTanks = [];
-  document.querySelectorAll(".tank-buttons label")
-    .forEach(l=>l.classList.remove("selected"));
+
+  document
+    .querySelectorAll(".tank-buttons label")
+    .forEach(l => l.classList.remove("selected"));
 
   updateSelectedTanksDisplay();
 
-  document.getElementById("customTanksSelection").style.display = "block";
+  document.getElementById("customTanksSelection").style.display =
+    totalLitres ? "block" : "none";
 
+  logDebug(`Done: ${totalLitres.toFixed(2)} L`);
 }
 
 function resetForm() {
 
   ["minuteVentilation","leak","biasFlow","hours","fio2"]
-  .forEach(id=>document.getElementById(id).value="");
+    .forEach(id => document.getElementById(id).value = "");
 
-  document.getElementById("results").style.display="none";
+  document.getElementById("results").style.display = "none";
 
-  selectedTanks=[];
+  ["litresPerMinute","totalLitres","tankSize",
+   "extraLitres","alertMessage","twoTanksOption"]
+   .forEach(id => document.getElementById(id).innerText = "");
 
-  document.querySelectorAll(".tank-buttons label")
-    .forEach(l=>l.classList.remove("selected"));
+  selectedTanks = [];
 
-  document.getElementById("debug").textContent="Debug Output:\n";
+  document
+    .querySelectorAll(".tank-buttons label")
+    .forEach(l => l.classList.remove("selected"));
 
+  updateSelectedTanksDisplay();
+
+  document.getElementById("combinedLitres").innerText = "0";
+  document.getElementById("volumeCheckMessage").innerText = "";
+  document.getElementById("customTanksSelection").style.display = "none";
+
+  document.getElementById("debug").textContent = "Debug Output:\n";
 }
 
 window.onload = generateTankCheckboxes;
@@ -468,4 +491,3 @@ window.onload = generateTankCheckboxes;
 
 </body>
 </html>
-
