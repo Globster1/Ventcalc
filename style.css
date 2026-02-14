@@ -1,6 +1,6 @@
 /* Base scaling */
 html {
-  font-size: 110%; /* Increase overall scale proportionally (was 100%) */
+  font-size: 100%; /* Increase overall scale proportionally (was 100%) */
 }
 
 body {
