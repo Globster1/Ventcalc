@@ -179,7 +179,6 @@ button:hover {
 
 <div class="container">
 
-<!-- HEADER IMAGE -->
 <img src="header.png" class="header-image" alt="life support">
 
 <h1>Oxygen Tank Duration Calculator</h1>
@@ -215,15 +214,11 @@ button:hover {
 <h2>Results</h2>
 
 <p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
-
 <p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
-
 <p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-
 <p><strong>Extra Litres Left:</strong> <span id="extraLitres"></span> L</p>
 
 <p id="alertMessage" style="color:red;font-weight:bold;"></p>
-
 <p id="twoTanksOption" style="font-weight:bold;"></p>
 
 </div>
@@ -272,7 +267,6 @@ let totalLitresRequired = 0;
 function logDebug(msg) {
   const box = document.getElementById("debug");
   box.textContent += "\n" + msg;
-  console.log(msg);
 }
 
 
@@ -297,7 +291,7 @@ function generateTankCheckboxes() {
     const btns = document.createElement("div");
     btns.className = "tank-buttons";
 
-    for (let i=0;i<3;i++) {
+    for (let i = 0; i < 3; i++) {
 
       const label = document.createElement("label");
       label.textContent = "x";
@@ -329,16 +323,16 @@ function toggleTank(e) {
     label: label
   };
 
-  const exists = selectedTanks.find(t=>t.label===label);
+  const exists = selectedTanks.find(t => t.label === label);
 
   if (exists) {
 
-    selectedTanks = selectedTanks.filter(t=>t.label!==label);
+    selectedTanks = selectedTanks.filter(t => t.label !== label);
     label.classList.remove("selected");
 
   } else {
 
-    if (selectedTanks.length>=3) {
+    if (selectedTanks.length >= 3) {
       alert("Max 3 tanks");
       return;
     }
@@ -355,33 +349,33 @@ function toggleTank(e) {
 
 function updateTankDisplay() {
 
-  const total = selectedTanks.reduce((s,t)=>s+t.value,0);
+  const total = selectedTanks.reduce((s, t) => s + t.value, 0);
 
   document.getElementById("combinedLitres").innerText =
     total.toFixed(2);
 
   const msg = document.getElementById("volumeCheckMessage");
 
-  if (totalLitresRequired>0) {
+  if (totalLitresRequired > 0) {
 
-    if (total>=totalLitresRequired) {
+    if (total >= totalLitresRequired) {
 
-      const rem = total-totalLitresRequired;
+      const rem = total - totalLitresRequired;
 
-      msg.style.color="green";
+      msg.style.color = "green";
       msg.innerText =
-      `Enough with ${rem.toFixed(2)} L remaining`;
+        `Enough with ${rem.toFixed(2)} L remaining`;
 
     } else {
 
-      msg.style.color="red";
-      msg.innerText="Not enough volume";
+      msg.style.color = "red";
+      msg.innerText = "Not enough volume";
 
     }
 
   } else {
 
-    msg.innerText="";
+    msg.innerText = "";
 
   }
 }
@@ -391,100 +385,90 @@ function updateTankDisplay() {
 
 function calculate() {
 
-  const minute =
-    parseFloat(minuteVentilation.value)||0;
-
-  const leak =
-    parseFloat(leak.value)||0;
-
-  const bias =
-    parseFloat(biasFlow.value)||0;
-
-  const hours =
-    parseFloat(hours.value)||0;
-
-  const fio2 =
-    parseFloat(fio2.value)||20.9;
+  const minute = parseFloat(document.getElementById("minuteVentilation").value) || 0;
+  const leak = parseFloat(document.getElementById("leak").value) || 0;
+  const bias = parseFloat(document.getElementById("biasFlow").value) || 0;
+  const hours = parseFloat(document.getElementById("hours").value) || 0;
+  const fio2 = parseFloat(document.getElementById("fio2").value) || 20.9;
 
 
   const lpm =
-   ((fio2-20.9)/79.1)*
-   (minute+leak+bias);
+    ((fio2 - 20.9) / 79.1) *
+    (minute + leak + bias);
 
   const total =
-    lpm*hours*60;
+    lpm * hours * 60;
 
   totalLitresRequired = total;
 
 
-  litresPerMinute.innerText =
-    lpm.toFixed(2);
-
-  totalLitres.innerText =
-    total.toFixed(2);
+  document.getElementById("litresPerMinute").innerText = lpm.toFixed(2);
+  document.getElementById("totalLitres").innerText = total.toFixed(2);
 
 
-  let best="None";
-  let bestVal=0;
+  let best = "None";
+  let bestVal = 0;
 
   for (let t of tankSizes) {
 
-    if (total<=t.value) {
-      best=t.name;
-      bestVal=t.value;
+    if (total <= t.value) {
+      best = t.name;
+      bestVal = t.value;
       break;
     }
   }
 
 
   const extra =
-    bestVal?bestVal-total:0;
+    bestVal ? bestVal - total : 0;
 
 
-  tankSize.innerText = best;
-  extraLitres.innerText = extra.toFixed(2);
+  document.getElementById("tankSize").innerText = best;
+  document.getElementById("extraLitres").innerText = extra.toFixed(2);
 
 
-  alertMessage.innerText =
-    bestVal?"":"WARNING: Too large";
+  document.getElementById("alertMessage").innerText =
+    bestVal ? "" : "WARNING: Too large";
 
 
-  let two="";
+  let two = "";
 
   if (bestVal) {
 
     const idx =
-      tankSizes.findIndex(t=>t.name===best);
+      tankSizes.findIndex(t => t.name === best);
 
-    for (let i=0;i<idx;i++) {
+    for (let i = 0; i < idx; i++) {
 
-      if (tankSizes[i].value*2>=total) {
+      if (tankSizes[i].value * 2 >= total) {
 
         const spare =
-         tankSizes[i].value*2-total;
+          tankSizes[i].value * 2 - total;
 
         two =
-        `Two ${tankSizes[i].name} tanks give ${spare.toFixed(2)} L spare`;
+          `Two ${tankSizes[i].name} tanks give ${spare.toFixed(2)} L spare`;
 
         break;
       }
     }
   }
 
-  twoTanksOption.innerText = two;
+  document.getElementById("twoTanksOption").innerText = two;
 
-  results.style.display="block";
+  document.getElementById("results").style.display = "block";
 
 
-  selectedTanks=[];
+  selectedTanks = [];
+
   document
     .querySelectorAll(".tank-buttons label")
-    .forEach(l=>l.classList.remove("selected"));
+    .forEach(l => l.classList.remove("selected"));
 
   updateTankDisplay();
 
-  customTanksSelection.style.display =
-    total?"block":"none";
+
+  document.getElementById("customTanksSelection").style.display =
+    total ? "block" : "none";
 
 
   logDebug("Calculated");
@@ -492,39 +476,39 @@ function calculate() {
 }
 
 
-/* RESET (RESTORED) */
+/* RESET */
 
 function resetForm() {
 
-  ["minuteVentilation","leak","biasFlow","hours","fio2"]
-  .forEach(id=>document.getElementById(id).value="");
+  ["minuteVentilation", "leak", "biasFlow", "hours", "fio2"]
+    .forEach(id => document.getElementById(id).value = "");
 
 
-  results.style.display="none";
+  document.getElementById("results").style.display = "none";
 
-  litresPerMinute.innerText="";
-  totalLitres.innerText="";
-  tankSize.innerText="";
-  extraLitres.innerText="";
-  alertMessage.innerText="";
-  twoTanksOption.innerText="";
+  document.getElementById("litresPerMinute").innerText = "";
+  document.getElementById("totalLitres").innerText = "";
+  document.getElementById("tankSize").innerText = "";
+  document.getElementById("extraLitres").innerText = "";
+  document.getElementById("alertMessage").innerText = "";
+  document.getElementById("twoTanksOption").innerText = "";
 
 
-  selectedTanks=[];
+  selectedTanks = [];
 
   document
     .querySelectorAll(".tank-buttons label")
-    .forEach(l=>l.classList.remove("selected"));
+    .forEach(l => l.classList.remove("selected"));
 
   updateTankDisplay();
 
 
-  combinedLitres.innerText="0";
-  volumeCheckMessage.innerText="";
-  customTanksSelection.style.display="none";
+  document.getElementById("combinedLitres").innerText = "0";
+  document.getElementById("volumeCheckMessage").innerText = "";
+  document.getElementById("customTanksSelection").style.display = "none";
 
 
-  debug.textContent="Debug Output:";
+  document.getElementById("debug").textContent = "Debug Output:";
 
 }
 
