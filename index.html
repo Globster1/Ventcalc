@@ -161,6 +161,7 @@ button:hover {
 
 /* Debug */
 #debug {
+  display: none; /* Hidden unless enabled */
   margin-top: 20px;
   background: #222;
   color: #0f0;
@@ -264,9 +265,18 @@ let totalLitresRequired = 0;
 
 /* Debug */
 
+let debugEnabled = false;
+
 function logDebug(msg) {
+
+  if (!debugEnabled) return;
+
   const box = document.getElementById("debug");
+
+  box.style.display = "block";
   box.textContent += "\n" + msg;
+
+  console.log(msg);
 }
 
 
@@ -511,6 +521,26 @@ function resetForm() {
   document.getElementById("debug").textContent = "Debug Output:";
 
 }
+
+
+// Secret tap to enable/disable debug
+let tapCount = 0;
+
+document.getElementById("appTitle").addEventListener("click", () => {
+
+  tapCount++;
+
+  if (tapCount >= 5) {
+
+    debugEnabled = !debugEnabled;
+
+    alert(
+      "Debug Mode " + (debugEnabled ? "Enabled" : "Disabled")
+    );
+
+    tapCount = 0;
+  }
+});
 
 
 window.onload = generateTankCheckboxes;
