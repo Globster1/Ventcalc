@@ -1,11 +1,21 @@
+// Debug toggle
+let debugEnabled = false;
+
 // Helper function to log messages to debug box
 function logDebug(message) {
-    const debugBox = document.getElementById("debug"); // Make sure this matches your HTML
+
+    if (!debugEnabled) return; // <-- OFF by default
+
+    const debugBox = document.getElementById("debug");
+
     if (debugBox) {
+        debugBox.style.display = "block";
         debugBox.textContent += message + "\n";
     }
-    console.log(message); // Also logs to browser console if available
+
+    console.log(message);
 }
+
 
 function calculate() {
     logDebug("=== Calculate button clicked ===");
