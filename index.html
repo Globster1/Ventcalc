@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,9 +111,7 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-button:active {
-    opacity: 0.7;
-}
+button:active { opacity: 0.7; }
 
 .reset-btn {
     background-color: #e5e5ea;
@@ -227,20 +226,19 @@ button:active {
             <span class="result-value" id="tankSize"></span>
         </div>
         <div class="result-row">
-            <span class="result-label">Extra Volume:</span>
+            <span class="result-label">Remaining Volume:</span>
             <span class="result-value" id="extraLitres"></span>
         </div>
         <p id="alertMessage" style="color:#ff3b30; font-weight:bold; text-align:center;"></p>
-        <p id="twoTanksOption" style="color:var(--ios-secondary-text); font-size:14px; text-align:center;"></p>
     </div>
 
     <div id="customTanksSelection" class="card" style="display:none;">
         <h3 style="margin-top:0">Combined Tanks (Max 3)</h3>
         <div id="tankList"></div>
-        <div style="margin-top:15px; text-align:center; font-size: 18px;">
-            Total Combined Litres: <strong><span id="combinedLitres">0</span> L</strong>
+        <div style="margin-top:15px; text-align:center;">
+            <div>Total Combined Litres: <strong><span id="combinedLitres">0</span> L</strong></div>
+            <div id="volumeCheckMessage"></div>
         </div>
-        <div id="volumeCheckMessage"></div>
     </div>
 </div>
 
@@ -302,7 +300,7 @@ function updateTankDisplay() {
         if (total >= totalLitresRequired) {
             const rem = total - totalLitresRequired;
             msg.style.color = "#34c759";
-            msg.innerText = `Enough with ${rem.toFixed(2)} L remaining`;
+            msg.innerText = `Volume Remaining: ${rem.toFixed(2)} L`;
         } else {
             msg.style.color = "#ff3b30";
             msg.innerText = "Not enough volume";
@@ -341,24 +339,9 @@ function calculate() {
     document.getElementById("extraLitres").innerText = extra.toFixed(2) + " L";
     document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: Too large";
 
-    // Logic for two smaller tanks
-    let two = "";
-    if (bestVal) {
-        const idx = tankSizes.findIndex(t => t.name === best);
-        for (let i = 0; i < idx; i++) {
-            if (tankSizes[i].value * 2 >= total) {
-                const spare = (tankSizes[i].value * 2) - total;
-                two = `Two ${tankSizes[i].name} tanks give ${spare.toFixed(2)} L spare`;
-                break;
-            }
-        }
-    }
-    document.getElementById("twoTanksOption").innerText = two;
-
     document.getElementById("results").style.display = "block";
     document.getElementById("customTanksSelection").style.display = total ? "block" : "none";
 
-    // Clear selections on fresh calculation
     selectedTanks = [];
     document.querySelectorAll(".tank-buttons label").forEach(l => l.classList.remove("selected"));
     updateTankDisplay();
@@ -378,4 +361,3 @@ window.onload = generateTankCheckboxes;
 </script>
 </body>
 </html>
-
