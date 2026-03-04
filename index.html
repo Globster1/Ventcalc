@@ -9,7 +9,7 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="VentCalc">
+<meta name="apple-mobile-web-app-title" content="T1 Transport Buddy">
 
 <style>
 :root {
@@ -44,19 +44,20 @@ header {
 
 .header-image {
     width: 100%;
-    height: auto; /* Changed from fixed height */
-    max-height: 180px; /* Limits how big it gets */
-    object-fit: contain; /* Ensures the whole image is seen, no cropping */
+    height: auto;
+    max-height: 180px;
+    object-fit: contain;
     border-radius: 12px;
     margin-bottom: 12px;
-    background-color: #ffffff; /* Adds a clean background behind the logo */
+    background-color: #ffffff;
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 22px; /* Slightly smaller to fit the longer title comfortably */
     font-weight: 700;
     margin: 0;
     letter-spacing: -0.5px;
+    padding: 0 10px;
 }
 
 .card {
@@ -184,7 +185,7 @@ button:active { opacity: 0.7; }
 <div class="container">
     <header>
         <img src="header.png" class="header-image" alt="Life Support">
-        <h1 id="appTitle">VentCalc</h1>
+        <h1 id="appTitle">Hamilton T1 Ventilator Oxygen Consumption Calculator</h1>
     </header>
 
     <div class="card">
