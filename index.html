@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,7 @@
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Hamilton T1 Ventilator Oxygen Consumption Calculator">
+<meta name="apple-mobile-web-app-title" content="VentCalc">
 
 <style>
 :root {
@@ -26,7 +25,6 @@ body {
     background-color: var(--ios-bg);
     color: var(--ios-text);
     margin: 0;
-    /* Respects the iPhone Notch and Dynamic Island */
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     line-height: 1.4;
@@ -58,7 +56,6 @@ h1 {
     letter-spacing: -0.5px;
 }
 
-/* Card Styling */
 .card {
     background: var(--ios-card);
     border-radius: 12px;
@@ -95,7 +92,6 @@ input {
     background: transparent;
 }
 
-/* Buttons */
 .button-row {
     display: flex;
     gap: 12px;
@@ -123,7 +119,6 @@ button:active {
     color: #ff3b30;
 }
 
-/* Results Section */
 #results {
     background-color: var(--ios-card);
     display: none;
@@ -143,7 +138,6 @@ button:active {
     font-size: 20px;
 }
 
-/* Custom Tank Selection Grid */
 .tank-row {
     display: flex;
     align-items: center;
@@ -161,12 +155,11 @@ button:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px; /* iOS standard tap target */
+    width: 44px;
     height: 44px;
     border-radius: 50%;
     border: 1px solid var(--ios-border);
     font-size: 14px;
-    transition: all 0.2s;
 }
 
 .tank-buttons label.selected {
@@ -245,7 +238,7 @@ button:active {
         <h3 style="margin-top:0">Combined Tanks (Max 3)</h3>
         <div id="tankList"></div>
         <div style="margin-top:15px; text-align:center; font-size: 18px;">
-            Total: <span id="combinedLitres" font-weight:700>0</span> L
+            Total Combined Litres: <strong><span id="combinedLitres">0</span> L</strong>
         </div>
         <div id="volumeCheckMessage"></div>
     </div>
@@ -293,7 +286,7 @@ function toggleTank(e) {
         selectedTanks = selectedTanks.filter(t => t.label !== label);
         label.classList.remove("selected");
     } else {
-        if (selectedTanks.length >= 3) return;
+        if (selectedTanks.length >= 3) { alert("Max 3 tanks"); return; }
         selectedTanks.push(tank);
         label.classList.add("selected");
     }
@@ -302,16 +295,20 @@ function toggleTank(e) {
 
 function updateTankDisplay() {
     const total = selectedTanks.reduce((s, t) => s + t.value, 0);
-    document.getElementById("combinedLitres").innerText = total.toFixed(0);
+    document.getElementById("combinedLitres").innerText = total.toFixed(2);
     const msg = document.getElementById("volumeCheckMessage");
+
     if (totalLitresRequired > 0) {
         if (total >= totalLitresRequired) {
+            const rem = total - totalLitresRequired;
             msg.style.color = "#34c759";
-            msg.innerText = "✓ Sufficient Volume";
+            msg.innerText = `Enough with ${rem.toFixed(2)} L remaining`;
         } else {
             msg.style.color = "#ff3b30";
-            msg.innerText = "Insufficient Volume";
+            msg.innerText = "Not enough volume";
         }
+    } else {
+        msg.innerText = "";
     }
 }
 
@@ -327,7 +324,7 @@ function calculate() {
     totalLitresRequired = total;
 
     document.getElementById("litresPerMinute").innerText = lpm.toFixed(2);
-    document.getElementById("totalLitres").innerText = total.toFixed(0);
+    document.getElementById("totalLitres").innerText = total.toFixed(2);
 
     let best = "None";
     let bestVal = 0;
@@ -339,12 +336,32 @@ function calculate() {
         }
     }
 
+    const extra = bestVal ? (bestVal - total) : 0;
     document.getElementById("tankSize").innerText = best;
-    document.getElementById("extraLitres").innerText = bestVal ? (bestVal - total).toFixed(0) + " L" : "0 L";
-    document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: Volume Exceeds Single Tank";
+    document.getElementById("extraLitres").innerText = extra.toFixed(2) + " L";
+    document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: Too large";
+
+    // Logic for two smaller tanks
+    let two = "";
+    if (bestVal) {
+        const idx = tankSizes.findIndex(t => t.name === best);
+        for (let i = 0; i < idx; i++) {
+            if (tankSizes[i].value * 2 >= total) {
+                const spare = (tankSizes[i].value * 2) - total;
+                two = `Two ${tankSizes[i].name} tanks give ${spare.toFixed(2)} L spare`;
+                break;
+            }
+        }
+    }
+    document.getElementById("twoTanksOption").innerText = two;
 
     document.getElementById("results").style.display = "block";
     document.getElementById("customTanksSelection").style.display = total ? "block" : "none";
+
+    // Clear selections on fresh calculation
+    selectedTanks = [];
+    document.querySelectorAll(".tank-buttons label").forEach(l => l.classList.remove("selected"));
+    updateTankDisplay();
 }
 
 function resetForm() {
@@ -354,9 +371,11 @@ function resetForm() {
     selectedTanks = [];
     document.querySelectorAll(".tank-buttons label").forEach(l => l.classList.remove("selected"));
     document.getElementById("combinedLitres").innerText = "0";
+    document.getElementById("volumeCheckMessage").innerText = "";
 }
 
 window.onload = generateTankCheckboxes;
 </script>
 </body>
 </html>
+
