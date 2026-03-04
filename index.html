@@ -66,31 +66,33 @@ h1 {
 }
 
 .input-group {
-    border-bottom: 1px solid var(--ios-border);
-    padding: 12px 0;
+    padding: 10px 0;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.input-group:last-child {
-    border-bottom: none;
+    flex-direction: column; /* Stack label over input for better box fit */
 }
 
 label {
-    font-size: 16px;
-    font-weight: 500;
-    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
 }
 
 input {
-    width: 100px;
-    border: none;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
     font-size: 17px;
-    text-align: right;
-    color: var(--ios-blue);
+    border: 2px solid var(--ios-border); /* Added lines back */
+    border-radius: 8px;
+    color: var(--ios-text);
+    background: #fff;
     outline: none;
-    background: transparent;
+    -webkit-appearance: none;
+}
+
+input:focus {
+    border-color: var(--ios-blue);
 }
 
 .button-row {
