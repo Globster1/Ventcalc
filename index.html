@@ -1,551 +1,362 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Hamilton T1 Ventilator Oxygen Consumption Calculator</title>
+<title>VentCalc - Hamilton T1</title>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VentCalc">
 
 <style>
-
-/* Base scaling (UNCHANGED) */
-html {
-  font-size: 100%;
+:root {
+    --ios-blue: #007aff;
+    --ios-bg: #f2f2f7;
+    --ios-card: #ffffff;
+    --ios-text: #000000;
+    --ios-secondary-text: #8e8e93;
+    --ios-border: #d1d1d6;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  background: #f8f8f8;
-  margin: 0;
-  padding: 0;
-  font-size: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--ios-bg);
+    color: var(--ios-text);
+    margin: 0;
+    /* Respects the iPhone Notch and Dynamic Island */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    line-height: 1.4;
 }
 
 .container {
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 16px;
 }
 
-/* Header image */
+header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
 .header-image {
-  width: 100%;
-  max-height: 180px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1rem;
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 12px;
 }
 
-/* Title */
 h1 {
-  text-align: center;
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 1rem;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
-/* Input section */
-.input-section {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.125rem 0.375rem rgba(0,0,0,0.1);
+/* Card Styling */
+.card {
+    background: var(--ios-card);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.input-group {
+    border-bottom: 1px solid var(--ios-border);
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.input-group:last-child {
+    border-bottom: none;
 }
 
 label {
-  display: block;
-  margin-top: 0.75rem;
-  font-weight: 600;
-  color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    flex: 1;
 }
 
 input {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 2px solid #666;
-  border-radius: 0.5rem;
-  margin-top: 0.3rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: #007aff;
-  box-shadow: 0 0 4px rgba(0,122,255,0.5);
+    width: 100px;
+    border: none;
+    font-size: 17px;
+    text-align: right;
+    color: var(--ios-blue);
+    outline: none;
+    background: transparent;
 }
 
 /* Buttons */
 .button-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.25rem;
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
 }
 
 button {
-  width: 48%;
-  padding: 1rem;
-  font-size: 1.1rem;
-  background: #007aff;
-  color: #fff;
-  border: none;
-  border-radius: 0.75rem;
-  cursor: pointer;
+    flex: 1;
+    background-color: var(--ios-blue);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    -webkit-tap-highlight-color: transparent;
 }
 
-button:hover {
-  background: #005bb5;
+button:active {
+    opacity: 0.7;
 }
 
 .reset-btn {
-  background: #6c757d;
+    background-color: #e5e5ea;
+    color: #ff3b30;
 }
 
-.reset-btn:hover {
-  background: #555;
-}
-
-/* Results */
+/* Results Section */
 #results {
-  background: #eaf5ea;
-  margin-top: 1.25rem;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 0.125rem 0.375rem rgba(0,0,0,0.1);
-  display: none;
+    background-color: var(--ios-card);
+    display: none;
 }
 
-#results h2 {
-  margin-top: 0;
-  color: #2b5d2e;
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
-#customTanksSelection {
-  background: #e0e7ff;
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-  display: none;
+.result-label { color: var(--ios-secondary-text); }
+.result-value { font-weight: 600; }
+
+.highlight {
+    color: var(--ios-blue);
+    font-size: 20px;
 }
 
-/* Tank buttons */
+/* Custom Tank Selection Grid */
 .tank-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--ios-border);
 }
 
-.tank-name {
-  width: 120px;
-  font-weight: bold;
+.tank-buttons {
+    display: flex;
+    gap: 8px;
 }
 
 .tank-buttons label {
-  display: inline-block;
-  width: 30px;
-  height: 30px;
-  margin-right: 5px;
-  line-height: 30px;
-  text-align: center;
-  border: 1px solid #666;
-  border-radius: 4px;
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px; /* iOS standard tap target */
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--ios-border);
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
 .tank-buttons label.selected {
-  background: #007aff;
-  color: #fff;
+    background-color: var(--ios-blue);
+    color: white;
+    border-color: var(--ios-blue);
 }
 
-/* Debug */
-#debug {
-  display: none; /* Hidden unless enabled */
-  margin-top: 20px;
-  background: #222;
-  color: #0f0;
-  padding: 10px;
-  font-family: monospace;
-  border-radius: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  font-size: 0.85rem;
+#volumeCheckMessage {
+    margin-top: 10px;
+    font-weight: 600;
+    text-align: center;
 }
-
 </style>
 </head>
 
 <body>
 
 <div class="container">
+    <header>
+        <img src="header.png" class="header-image" alt="Life Support">
+        <h1 id="appTitle">VentCalc</h1>
+    </header>
 
-<img src="header.png" class="header-image" alt="life support">
+    <div class="card">
+        <div class="input-group">
+            <label>Min. Vent (L/min)</label>
+            <input type="number" inputmode="decimal" id="minuteVentilation" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Leak (L/min)</label>
+            <input type="number" inputmode="decimal" id="leak" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Bias Flow (L/min)</label>
+            <input type="number" inputmode="decimal" id="biasFlow" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Hours</label>
+            <input type="number" inputmode="decimal" id="hours" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>FiO₂ (%)</label>
+            <input type="number" inputmode="decimal" id="fio2" placeholder="21" min="20.9" max="100">
+        </div>
+    </div>
 
-<h1 id="appTitle">Oxygen Tank Duration Calculator</h1>
+    <div class="button-row">
+        <button onclick="calculate()">Calculate</button>
+        <button class="reset-btn" onclick="resetForm()">Reset</button>
+    </div>
 
-<div class="input-section">
+    <div id="results" class="card">
+        <h3 style="margin-top:0">Results</h3>
+        <div class="result-row">
+            <span class="result-label">Consumption Rate:</span>
+            <span class="result-value"><span id="litresPerMinute"></span> L/min</span>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Total Required:</span>
+            <span class="result-value highlight"><span id="totalLitres"></span> L</span>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Recommended Tank:</span>
+            <span class="result-value" id="tankSize"></span>
+        </div>
+        <div class="result-row">
+            <span class="result-label">Extra Volume:</span>
+            <span class="result-value" id="extraLitres"></span>
+        </div>
+        <p id="alertMessage" style="color:#ff3b30; font-weight:bold; text-align:center;"></p>
+        <p id="twoTanksOption" style="color:var(--ios-secondary-text); font-size:14px; text-align:center;"></p>
+    </div>
 
-<label>Minute Ventilation (L/min)</label>
-<input type="number" id="minuteVentilation" step="0.01">
-
-<label>Leak (L/min)</label>
-<input type="number" id="leak" step="0.01">
-
-<label>Bias Flow (L/min)</label>
-<input type="number" id="biasFlow" step="0.01">
-
-<label>Hours to Ventilate</label>
-<input type="number" id="hours" step="0.01">
-
-<label>FiO₂ (%)</label>
-<input type="number" id="fio2" step="0.1" min="20.9" max="100">
-
-<div class="button-row">
-  <button onclick="calculate()">Calculate</button>
-  <button class="reset-btn" onclick="resetForm()">Reset</button>
+    <div id="customTanksSelection" class="card" style="display:none;">
+        <h3 style="margin-top:0">Combined Tanks (Max 3)</h3>
+        <div id="tankList"></div>
+        <div style="margin-top:15px; text-align:center; font-size: 18px;">
+            Total: <span id="combinedLitres" font-weight:700>0</span> L
+        </div>
+        <div id="volumeCheckMessage"></div>
+    </div>
 </div>
-
-</div>
-
-
-<!-- RESULTS -->
-<div id="results">
-
-<h2>Results</h2>
-
-<p><strong>Litres per Minute:</strong> <span id="litresPerMinute"></span> L/min</p>
-<p><strong>Total Litres:</strong> <span id="totalLitres"></span> L</p>
-<p><strong>Recommended Tank:</strong> <span id="tankSize"></span></p>
-<p><strong>Extra Litres Left:</strong> <span id="extraLitres"></span> L</p>
-
-<p id="alertMessage" style="color:red;font-weight:bold;"></p>
-<p id="twoTanksOption" style="font-weight:bold;"></p>
-
-</div>
-
-
-<!-- CUSTOM TANKS -->
-<div id="customTanksSelection">
-
-<h3>Select Tanks (up to 3)</h3>
-
-<div id="tankList"></div>
-
-<div>
-Total Combined Litres:
-<span id="combinedLitres">0</span> L
-</div>
-
-<div id="volumeCheckMessage"></div>
-
-</div>
-
-
-<div id="debug">Debug Output:</div>
-
-</div>
-
 
 <script>
-
-/* Tank data */
-
 const tankSizes = [
-  { name: "D", value: 425 },
-  { name: "E", value: 680 },
-  { name: "M60", value: 1738 },
-  { name: "M/MM/M122", value: 3455 },
-  { name: "H/K", value: 7080 }
+    { name: "D", value: 425 },
+    { name: "E", value: 680 },
+    { name: "M60", value: 1738 },
+    { name: "M/MM/M122", value: 3455 },
+    { name: "H/K", value: 7080 }
 ];
 
 let selectedTanks = [];
 let totalLitresRequired = 0;
 
-
-/* Debug */
-
-let debugEnabled = false;
-
-function logDebug(msg) {
-
-  if (!debugEnabled) return;
-
-  const box = document.getElementById("debug");
-
-  box.style.display = "block";
-  box.textContent += "\n" + msg;
-
-  console.log(msg);
-}
-
-
-/* Build tank buttons */
-
 function generateTankCheckboxes() {
-
-  const div = document.getElementById("tankList");
-  div.innerHTML = "";
-
-  tankSizes.forEach(tank => {
-
-    const row = document.createElement("div");
-    row.className = "tank-row";
-
-    const name = document.createElement("div");
-    name.className = "tank-name";
-    name.textContent = `${tank.name} (${tank.value} L)`;
-
-    row.appendChild(name);
-
-    const btns = document.createElement("div");
-    btns.className = "tank-buttons";
-
-    for (let i = 0; i < 3; i++) {
-
-      const label = document.createElement("label");
-      label.textContent = "x";
-
-      label.dataset.name = tank.name;
-      label.dataset.value = tank.value;
-
-      label.onclick = toggleTank;
-
-      btns.appendChild(label);
-    }
-
-    row.appendChild(btns);
-    div.appendChild(row);
-
-  });
+    const div = document.getElementById("tankList");
+    div.innerHTML = "";
+    tankSizes.forEach(tank => {
+        const row = document.createElement("div");
+        row.className = "tank-row";
+        row.innerHTML = `<div class="tank-name"><strong>${tank.name}</strong> <small>(${tank.value}L)</small></div>`;
+        const btns = document.createElement("div");
+        btns.className = "tank-buttons";
+        for (let i = 0; i < 3; i++) {
+            const label = document.createElement("label");
+            label.textContent = "x";
+            label.dataset.name = tank.name;
+            label.dataset.value = tank.value;
+            label.onclick = toggleTank;
+            btns.appendChild(label);
+        }
+        row.appendChild(btns);
+        div.appendChild(row);
+    });
 }
-
-
-/* Toggle tanks */
 
 function toggleTank(e) {
-
-  const label = e.target;
-
-  const tank = {
-    name: label.dataset.name,
-    value: parseFloat(label.dataset.value),
-    label: label
-  };
-
-  const exists = selectedTanks.find(t => t.label === label);
-
-  if (exists) {
-
-    selectedTanks = selectedTanks.filter(t => t.label !== label);
-    label.classList.remove("selected");
-
-  } else {
-
-    if (selectedTanks.length >= 3) {
-      alert("Max 3 tanks");
-      return;
+    const label = e.target;
+    const tank = { label: label, value: parseFloat(label.dataset.value) };
+    const exists = selectedTanks.find(t => t.label === label);
+    if (exists) {
+        selectedTanks = selectedTanks.filter(t => t.label !== label);
+        label.classList.remove("selected");
+    } else {
+        if (selectedTanks.length >= 3) return;
+        selectedTanks.push(tank);
+        label.classList.add("selected");
     }
-
-    selectedTanks.push(tank);
-    label.classList.add("selected");
-  }
-
-  updateTankDisplay();
+    updateTankDisplay();
 }
-
-
-/* Update tanks */
 
 function updateTankDisplay() {
-
-  const total = selectedTanks.reduce((s, t) => s + t.value, 0);
-
-  document.getElementById("combinedLitres").innerText =
-    total.toFixed(2);
-
-  const msg = document.getElementById("volumeCheckMessage");
-
-  if (totalLitresRequired > 0) {
-
-    if (total >= totalLitresRequired) {
-
-      const rem = total - totalLitresRequired;
-
-      msg.style.color = "green";
-      msg.innerText =
-        `Enough with ${rem.toFixed(2)} L remaining`;
-
-    } else {
-
-      msg.style.color = "red";
-      msg.innerText = "Not enough volume";
-
+    const total = selectedTanks.reduce((s, t) => s + t.value, 0);
+    document.getElementById("combinedLitres").innerText = total.toFixed(0);
+    const msg = document.getElementById("volumeCheckMessage");
+    if (totalLitresRequired > 0) {
+        if (total >= totalLitresRequired) {
+            msg.style.color = "#34c759";
+            msg.innerText = "✓ Sufficient Volume";
+        } else {
+            msg.style.color = "#ff3b30";
+            msg.innerText = "Insufficient Volume";
+        }
     }
-
-  } else {
-
-    msg.innerText = "";
-
-  }
 }
-
-
-/* Calculate */
 
 function calculate() {
+    const minute = parseFloat(document.getElementById("minuteVentilation").value) || 0;
+    const leak = parseFloat(document.getElementById("leak").value) || 0;
+    const bias = parseFloat(document.getElementById("biasFlow").value) || 0;
+    const hours = parseFloat(document.getElementById("hours").value) || 0;
+    const fio2 = parseFloat(document.getElementById("fio2").value) || 20.9;
 
-  const minute = parseFloat(document.getElementById("minuteVentilation").value) || 0;
-  const leak = parseFloat(document.getElementById("leak").value) || 0;
-  const bias = parseFloat(document.getElementById("biasFlow").value) || 0;
-  const hours = parseFloat(document.getElementById("hours").value) || 0;
-  const fio2 = parseFloat(document.getElementById("fio2").value) || 20.9;
+    const lpm = ((fio2 - 20.9) / 79.1) * (minute + leak + bias);
+    const total = lpm * hours * 60;
+    totalLitresRequired = total;
 
+    document.getElementById("litresPerMinute").innerText = lpm.toFixed(2);
+    document.getElementById("totalLitres").innerText = total.toFixed(0);
 
-  const lpm =
-    ((fio2 - 20.9) / 79.1) *
-    (minute + leak + bias);
-
-  const total =
-    lpm * hours * 60;
-
-  totalLitresRequired = total;
-
-
-  document.getElementById("litresPerMinute").innerText = lpm.toFixed(2);
-  document.getElementById("totalLitres").innerText = total.toFixed(2);
-
-
-  let best = "None";
-  let bestVal = 0;
-
-  for (let t of tankSizes) {
-
-    if (total <= t.value) {
-      best = t.name;
-      bestVal = t.value;
-      break;
+    let best = "None";
+    let bestVal = 0;
+    for (let t of tankSizes) {
+        if (total <= t.value) {
+            best = t.name;
+            bestVal = t.value;
+            break;
+        }
     }
-  }
 
+    document.getElementById("tankSize").innerText = best;
+    document.getElementById("extraLitres").innerText = bestVal ? (bestVal - total).toFixed(0) + " L" : "0 L";
+    document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: Volume Exceeds Single Tank";
 
-  const extra =
-    bestVal ? bestVal - total : 0;
-
-
-  document.getElementById("tankSize").innerText = best;
-  document.getElementById("extraLitres").innerText = extra.toFixed(2);
-
-
-  document.getElementById("alertMessage").innerText =
-    bestVal ? "" : "WARNING: Too large";
-
-
-  let two = "";
-
-  if (bestVal) {
-
-    const idx =
-      tankSizes.findIndex(t => t.name === best);
-
-    for (let i = 0; i < idx; i++) {
-
-      if (tankSizes[i].value * 2 >= total) {
-
-        const spare =
-          tankSizes[i].value * 2 - total;
-
-        two =
-          `Two ${tankSizes[i].name} tanks give ${spare.toFixed(2)} L spare`;
-
-        break;
-      }
-    }
-  }
-
-  document.getElementById("twoTanksOption").innerText = two;
-
-  document.getElementById("results").style.display = "block";
-
-
-  selectedTanks = [];
-
-  document
-    .querySelectorAll(".tank-buttons label")
-    .forEach(l => l.classList.remove("selected"));
-
-  updateTankDisplay();
-
-
-  document.getElementById("customTanksSelection").style.display =
-    total ? "block" : "none";
-
-
-  logDebug("Calculated");
-
+    document.getElementById("results").style.display = "block";
+    document.getElementById("customTanksSelection").style.display = total ? "block" : "none";
 }
-
-
-/* RESET */
 
 function resetForm() {
-
-  ["minuteVentilation", "leak", "biasFlow", "hours", "fio2"]
-    .forEach(id => document.getElementById(id).value = "");
-
-
-  document.getElementById("results").style.display = "none";
-
-  document.getElementById("litresPerMinute").innerText = "";
-  document.getElementById("totalLitres").innerText = "";
-  document.getElementById("tankSize").innerText = "";
-  document.getElementById("extraLitres").innerText = "";
-  document.getElementById("alertMessage").innerText = "";
-  document.getElementById("twoTanksOption").innerText = "";
-
-
-  selectedTanks = [];
-
-  document
-    .querySelectorAll(".tank-buttons label")
-    .forEach(l => l.classList.remove("selected"));
-
-  updateTankDisplay();
-
-
-  document.getElementById("combinedLitres").innerText = "0";
-  document.getElementById("volumeCheckMessage").innerText = "";
-  document.getElementById("customTanksSelection").style.display = "none";
-
-
-  document.getElementById("debug").textContent = "Debug Output:";
-
+    ["minuteVentilation", "leak", "biasFlow", "hours", "fio2"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("results").style.display = "none";
+    document.getElementById("customTanksSelection").style.display = "none";
+    selectedTanks = [];
+    document.querySelectorAll(".tank-buttons label").forEach(l => l.classList.remove("selected"));
+    document.getElementById("combinedLitres").innerText = "0";
 }
 
-
-// Secret tap to enable/disable debug
-let tapCount = 0;
-
-document.getElementById("appTitle").addEventListener("click", () => {
-
-  tapCount++;
-
-  if (tapCount >= 5) {
-
-    debugEnabled = !debugEnabled;
-
-    alert(
-      "Debug Mode " + (debugEnabled ? "Enabled" : "Disabled")
-    );
-
-    tapCount = 0;
-  }
-});
-
-
 window.onload = generateTankCheckboxes;
-
 </script>
-
 </body>
 </html>
