@@ -1,75 +1,37 @@
-// Debug toggle
-let debugEnabled = false;
+const CACHE_NAME = "t1-buddy-v1";
+const ASSETS = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/header.png",
+  "/ventcalc_icons/icon-180.png",
+  "/ventcalc_icons/icon-192.png",
+  "/ventcalc_icons/icon-512.png"
+];
 
-// Helper function to log messages to debug box
-function logDebug(message) {
+// Install: cache all core assets
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+  );
+  self.skipWaiting();
+});
 
-    if (!debugEnabled) return; // <-- OFF by default
+// Activate: clean up old caches
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      )
+    )
+  );
+  self.clients.claim();
+});
 
-    const debugBox = document.getElementById("debug");
-
-    if (debugBox) {
-        debugBox.style.display = "block";
-        debugBox.textContent += message + "\n";
-    }
-
-    console.log(message);
-}
-
-
-function calculate() {
-    logDebug("=== Calculate button clicked ===");
-
-    try {
-        const minuteVentilation = parseFloat(document.getElementById("minuteVentilation").value) || 0;
-        const leak = parseFloat(document.getElementById("leak").value) || 0;
-        const biasFlow = parseFloat(document.getElementById("biasFlow").value) || 0;
-        const hours = parseFloat(document.getElementById("hours").value) || 0;
-
-        logDebug("Inputs received:");
-        logDebug("Minute Ventilation: " + minuteVentilation);
-        logDebug("Leak: " + leak);
-        logDebug("Bias Flow: " + biasFlow);
-        logDebug("Hours: " + hours);
-
-        // Step 1: Calculate litres per minute
-        const litresPerMinute = minuteVentilation + leak + biasFlow;
-        logDebug("Litres per Minute = " + litresPerMinute);
-
-        // Step 2: Calculate total litres
-        const totalLitres = litresPerMinute * hours * 60;
-        logDebug("Total Litres = " + totalLitres);
-
-        // Step 3: Compare to tank sizes
-        const tankSizes = [
-            { name: "D", value: 425 },
-            { name: "DJ", value: 640 },
-            { name: "E", value: 680 },
-            { name: "M", value: 1738 },
-            { name: "M/MM/M122", value: 3455 },
-            { name: "H/K", value: 7080 }
-        ];
-
-        let selectedTank = "None – too large";
-        for (let i = 0; i < tankSizes.length; i++) {
-            if (totalLitres <= tankSizes[i].value) {
-                selectedTank = tankSizes[i].name;
-                break;
-            }
-        }
-
-        logDebug("Selected Tank = " + selectedTank);
-
-        // Update UI
-        const resultsDiv = document.getElementById("results");
-        if (resultsDiv) {
-            document.getElementById("litresPerMinute").innerText = litresPerMinute.toFixed(2);
-            document.getElementById("totalLitres").innerText = totalLitres.toFixed(2);
-            document.getElementById("tankSize").innerText = selectedTank;
-            resultsDiv.style.display = "block";
-        }
-
-    } catch (error) {
-        logDebug("ERROR: " + error.message);
-    }
-}
+// Fetch: serve from cache, fall back to network
+self.addEventListener("fetch", event => {
+  event.respondWith(
+    caches.match(event.request).then(cached => cached || fetch(event.request))
+  );
+});
