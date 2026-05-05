@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,8 @@
 
 <title>T1 Transport Buddy</title>
 
- <link rel="apple-touch-icon" href="ventcalc_icons/icon-180.png">   
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="ventcalc_icons/icon-180.png">   
 
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -344,7 +344,7 @@ function calculate() {
     const extra = bestVal ? (bestVal - total) : 0;
     document.getElementById("tankSize").innerText = best;
     document.getElementById("extraLitres").innerText = extra.toFixed(2) + " L";
-    document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: Too large";
+    document.getElementById("alertMessage").innerText = bestVal ? "" : "WARNING: No single tank is large enough — use the selector below.";
 
     document.getElementById("results").style.display = "block";
     document.getElementById("customTanksSelection").style.display = total ? "block" : "none";
@@ -366,5 +366,12 @@ function resetForm() {
 
 window.onload = generateTankCheckboxes;
 </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
+</script>
+
 </body>
 </html>
